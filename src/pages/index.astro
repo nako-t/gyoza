@@ -2,4 +2,20 @@
 import Layout from "../layouts/Layout.astro";
 ---
 
-<Layout />
+<Layout>
+  <h1 id="heading">餃子を食べよう！🥟</h1>
+</Layout>
+<script>
+  import { gsap, SplitText } from "@/utils/gsap";
+
+  gsap.set("h1", { opacity: 1 });
+
+  let split = SplitText.create("#heading", { type: "chars", mask: "chars" });
+  gsap.from(split.chars, {
+    y: 50,
+    opacity: 0,
+    duration: 0.8,
+    stagger: 0.1,
+    ease: "power3.out",
+  });
+</script>

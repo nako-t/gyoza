@@ -1,0 +1,133 @@
+---
+import "@/components/header/index.scss";
+import { navItems } from "./navItems.ts";
+
+---
+
+<header class="header">
+  <nav class="globalNavigation" data-global-navigation>
+    <ul class="globalNavigation__inner" data-nav-items-container>
+      {
+        navItems.map((item) => (
+          <li class="globalNavigation__item" data-nav-item>
+            <a
+              class="globalNavigation__link"
+              href={item.href}
+              data-nav-item-link
+            >
+              <span class="globalNavigation__link-text">{item.label}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="globalNavigation__cursor" data-nav-cursor></div>
+  </nav>
+  <button class="hamburgerButton" data-hamburger-button>
+    <span class="hamburgerButton__bar"></span>
+    <span class="hamburgerButton__bar"></span>
+    <span class="hamburgerButton__bar"></span>
+  </button>
+</header>
+
+<script>
+  const initNavigation = () => {
+    const currentPath = window.location.pathname;
+
+    const navItemsContainer = document.querySelector<HTMLElement>(
+      "[data-nav-items-container]"
+    );
+    const navItemElements =
+      document.querySelectorAll<HTMLElement>("[data-nav-item]");
+    const cursor = document.querySelector<HTMLElement>("[data-nav-cursor]");
+
+    if (
+      !navItemsContainer ||
+      navItemElements.length === 0 ||
+      !cursor
+    )
+      return;
+
+    const activeItem =
+      Array.from(navItemElements).find((item) => {
+        const itemLinkElement = item.querySelector<HTMLAnchorElement>(
+          "[data-nav-item-link]"
+        );
+        return itemLinkElement?.pathname === currentPath;
+      }) || navItemElements[0];
+
+    const updateCursor = (
+      targetItem: Element,
+      options: { immediate?: boolean } = {}
+    ) => {
+      const navItemsContainerRect = navItemsContainer.getBoundingClientRect();
+      const targetRect = targetItem.getBoundingClientRect();
+      const newX = targetRect.left - navItemsContainerRect.left;
+
+      cursor.style.width = `${targetRect.width}px`;
+      cursor.style.height = `${targetRect.height}px`;
+
+      if (options.immediate) {
+        cursor.style.transform = `translate(${newX}px)`;
+      } else {
+        cursor.animate(
+          [
+            {
+              transform: window
+                .getComputedStyle(cursor)
+                .getPropertyValue("transform"),
+            },
+            {
+              transform: `translate(${newX}px)`,
+            },
+          ],
+          {
+            duration: 300,
+            easing: "ease-in-out",
+            fill: "forwards", // アニメーション終了後に最終状態を維持
+          }
+        );
+      }
+    };
+
+    window.addEventListener("load", () => {
+      updateCursor(activeItem);
+    });
+
+    let resizeTimer: number;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        updateCursor(activeItem, { immediate: true });
+      }, 100);
+    });
+
+    navItemElements.forEach((item) => {
+      item.addEventListener("mouseenter", () => {
+        updateCursor(item);
+      });
+    });
+
+    navItemsContainer.addEventListener("mouseleave", () => {
+      updateCursor(activeItem);
+    });
+  };
+
+  const initHamburgerButton = () => {
+    const hamburgerButton = document.querySelector("[data-hamburger-button]");
+    if (!hamburgerButton) return;
+
+    hamburgerButton.addEventListener("click", () => {
+      const globalNavigation = document.querySelector(
+        "[data-global-navigation]"
+      );
+      if (!globalNavigation) return;
+
+      globalNavigation.classList.toggle("is-active");
+      hamburgerButton.classList.toggle("is-open");
+    });
+  };
+
+  initNavigation();
+  initHamburgerButton();
+</script>

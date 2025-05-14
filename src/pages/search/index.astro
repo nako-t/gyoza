@@ -1,0 +1,270 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import "@/pages/search/index.scss";
+import { data } from "@/pages/search/shopData.ts";
+import { areaData } from "@/pages/search/areaData.ts";
+
+const availableAreas = new Set(data.map((item) => item.area));
+---
+
+<Layout>
+  <h2 class="pageTitle">餃子のお店を探す</h2>
+  <form class="filter" data-filter-form>
+    <fieldset class="filter__regions">
+      {
+        Object.entries(areaData).map(([region, prefectures]) => (
+          <div class="filter__region">
+            <h4 class="filter__region-name">{region}</h4>
+            <div class="filter__checkboxs">
+              {prefectures.map((prefecture: string) => {
+                const isDisabled = !availableAreas.has(prefecture);
+                return (
+                  <div>
+                    <input
+                      type="checkbox"
+                      id={prefecture}
+                      data-checkbox
+                      value={prefecture}
+                      disabled={isDisabled}
+                      class:list={[{ filter__checkbox: isDisabled }]}
+                    />
+                    <label for={prefecture}>{prefecture}</label>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))
+      }
+    </fieldset>
+    <div class="filter__buttons">
+      <button type="reset" data-button="reset" class="filter__button" disabled
+        >条件をリセットする</button
+      >
+      <button
+        type="button"
+        data-filter
+        class="filter__button filter__button--filter"
+        disabled>絞り込む</button
+      >
+    </div>
+  </form>
+
+  <div class="search is-active" data-tab-content="list">
+    {
+      data.map((item, index) => (
+        <div class="search__item" data-shop data-area={item.area}>
+          <button data-shop-modal="open" data-slideid={index} type="button">
+            <img
+              src=""
+              alt=""
+              width="200"
+              height="200"
+              class="search__shopImg"
+            />
+          </button>
+          <h3 class="search__shopName">{item.shopName}</h3>
+          <span class="search__location">{item.area}</span>
+        </div>
+      ))
+    }
+    <dialog class="shopModal" data-shop-modal="dialog">
+      <button
+        class="shopModal__closeButton"
+        data-shop-modal="close"
+        type="button"><span class="shopModal__closeIcon"></span></button
+      >
+      <div class="shopModal__slider">
+        <div class="shopModal__slideWrapper" data-shop-modal="slideWrapper">
+          {
+            data.map((item, index) => (
+              <div class="shopModal__slide" data-shop-modal="slide">
+                <div class="shopModal__content">
+                  <img src="" alt="" width="250" height="250" loading="lazy" />
+                  <div class="shopModal__description">
+                    <span class="shopModal__shopName">
+                      {item.shopName + index}
+                    </span>
+                    <span class="shopModal__location">{item.area}</span>
+                    <p class="shopModal__descriptionText">{item.description}</p>
+                  </div>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+      <button
+        class="shopModal__nextButton shopModal__slideButton"
+        data-shop-modal="next"
+        type="button"></button>
+      <button
+        class="shopModal__prevButton shopModal__slideButton"
+        data-shop-modal="prev"
+        type="button"></button>
+    </dialog>
+  </div>
+
+  <script>
+    (() => {
+      const initFilterForm = () => {
+        const formElement =
+          document.querySelector<HTMLFormElement>("[data-filter-form]");
+        const filterButton =
+          document.querySelector<HTMLButtonElement>("[data-filter]");
+        const resetButton = document.querySelector<HTMLButtonElement>(
+          '[data-button="reset"]'
+        );
+        const checkboxes =
+          document.querySelectorAll<HTMLInputElement>("[data-checkbox]");
+        const shopElements =
+          document.querySelectorAll<HTMLElement>("[data-shop]");
+
+        if (
+          !formElement ||
+          !filterButton ||
+          !resetButton ||
+          !checkboxes.length
+        ) {
+          return;
+        }
+
+        // チェックされたチェックボックスの値を取得する
+        const getCheckedValues = () => {
+          return Array.from(checkboxes)
+            .filter((checkbox) => checkbox.checked)
+            .map((checkbox) => checkbox.value);
+        };
+
+        // ボタンの活性・非活性状態を更新する
+        const updateButtonState = () => {
+          const hasSelectedItems = Array.from(checkboxes).some(
+            (checkbox) => checkbox.checked
+          );
+          filterButton.disabled = !hasSelectedItems;
+          resetButton.disabled = !hasSelectedItems;
+        };
+
+        // 店舗リストの表示を更新する
+        const updateShopVisibility = (filteredAreas: string[]) => {
+          shopElements.forEach((element) => {
+            const shopArea = element.dataset.area;
+            if (!shopArea) return;
+
+            // filteredAreasに店舗のエリアが含まれていない場合に 'is-not-display' クラスを付与
+            const isHidden = !filteredAreas.includes(shopArea);
+            element.classList.toggle("is-not-display", isHidden);
+          });
+        };
+
+        // 絞り込みボタンがクリックされたときの処理
+        const handleFilterClick = () => {
+          const filteredAreas = getCheckedValues();
+          updateShopVisibility(filteredAreas);
+        };
+
+        // フォームがリセットされたときの処理
+        const handleFormReset = () => {
+          shopElements.forEach((element) => {
+            element.classList.remove("is-not-display");
+          });
+
+          // ブラウザがフォームをリセットするのを待ってからボタンの状態を更新するため、実行を遅延させる
+          requestAnimationFrame(updateButtonState);
+        };
+
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener("change", updateButtonState);
+        });
+
+        filterButton.addEventListener("click", handleFilterClick);
+        formElement.addEventListener("reset", handleFormReset);
+      };
+
+      initFilterForm();
+
+      // スライダー
+      const createSlider = (wrapperSelector: string, slideSelector: string) => {
+        let currentIndex = 0;
+        const slideWrapper =
+          document.querySelector<HTMLElement>(wrapperSelector);
+        const slides = document.querySelectorAll(slideSelector);
+        const totalSlides = slides.length;
+
+        const goTo = (index: number) => {
+          currentIndex = index;
+          update();
+        };
+
+        const next = () => {
+          currentIndex = (currentIndex + 1) % totalSlides;
+          update();
+        };
+
+        const prev = () => {
+          currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+          update();
+        };
+
+        const update = () => {
+          if (slideWrapper) {
+            slideWrapper.style.transform = `translateX(${-currentIndex * 100}%)`;
+          }
+        };
+
+        return { goTo, next, prev, update };
+      };
+
+      // モーダル
+      const createModal = (dialogSelector: string, closeSelector: string) => {
+        const dialog =
+          document.querySelector<HTMLDialogElement>(dialogSelector);
+        const closeButton = document.querySelector(closeSelector);
+
+        const open = () => {
+          dialog?.showModal();
+        };
+
+        const close = () => {
+          dialog?.close();
+        };
+
+        closeButton?.addEventListener("click", close);
+        dialog?.addEventListener("click", (e) => {
+          if (e.target === dialog) close();
+        });
+
+        return { open, close };
+      };
+
+      const slider = createSlider(
+        '[data-shop-modal="slideWrapper"]',
+        '[data-shop-modal="slide"]'
+      );
+
+      const modal = createModal(
+        '[data-shop-modal="dialog"]',
+        '[data-shop-modal="close"]'
+      );
+
+      // モーダルトリガー
+      document
+        .querySelectorAll<HTMLElement>('[data-shop-modal="open"]')
+        .forEach((toggle) => {
+          toggle.addEventListener("click", () => {
+            const slideId = Number(toggle.dataset.slideid) || 0;
+            slider.goTo(slideId);
+            modal.open();
+          });
+        });
+
+      // スライドボタン
+      document
+        .querySelector('[data-shop-modal="next"]')
+        ?.addEventListener("click", slider.next);
+      document
+        .querySelector('[data-shop-modal="prev"]')
+        ?.addEventListener("click", slider.prev);
+    })();
+  </script>
+</Layout>
