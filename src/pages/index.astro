@@ -2,6 +2,7 @@
 import Layout from "../layouts/Layout.astro";
 import "../pages/index.scss";
 import Gyoza from "../components/gyoza/index.astro";
+import AccordionList from "@/components/AccordionList.astro";
 
 // Cookieを使用して訪問履歴を確認
 const hasVisited = Astro.cookies.has("visited");
@@ -18,6 +19,7 @@ if (!hasVisited) {
 <Layout>
   <h1 id="heading">Portfolio</h1>
   {!hasVisited && <Gyoza />}
+  <AccordionList />
 
   <script>
     import { gsap, SplitText } from "@/utils/gsap";
