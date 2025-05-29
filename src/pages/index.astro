@@ -5,8 +5,8 @@ import Gyoza from "../components/gyoza/index.astro";
 import AccordionList from "@/components/AccordionList.astro";
 
 // Cookieを使用して訪問履歴を確認
-const hasVisited = Astro.cookies.has("visited");
-
+// const hasVisited = Astro.cookies.has("visited");
+const hasVisited = false;
 // 訪問済みでない場合はCookieを設定
 if (!hasVisited) {
   Astro.cookies.set("visited", "true", {
@@ -17,9 +17,9 @@ if (!hasVisited) {
 ---
 
 <Layout>
-  <h1 id="heading">Portfolio</h1>
+  <!-- <h1 id="heading">Portfolio</h1> -->
   {!hasVisited && <Gyoza />}
-  <AccordionList />
+  <!-- <AccordionList /> -->
 
   <script>
     import { gsap, SplitText } from "@/utils/gsap";
