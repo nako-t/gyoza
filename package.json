@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "astro": "^5.7.12",
-    "gsap": "^3.13.0"
+    "gsap": "^3.13.0",
+    "normalize.css": "^8.0.1"
   },
   "devDependencies": {
     "sass-embedded": "^1.89.0"
