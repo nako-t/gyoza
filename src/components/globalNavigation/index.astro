@@ -1,0 +1,104 @@
+---
+import "@/components/globalNavigation/index.scss";
+
+const navItems = [
+  {
+    label: "Home",
+    href: "/",
+  },
+  {
+    label: "探す",
+    href: "/",
+  },
+  {
+    label: "作る",
+    href: "/",
+  },
+  {
+    label: "知る",
+    href: "/",
+  },
+];
+---
+
+<nav class="globalNavigation">
+  <ul class="globalNavigation__inner" data-nav-items-container>
+    {
+      navItems.map((item) => (
+        <li class="globalNavigation__item" data-nav-items>
+          <a class="globalNavigation__link" href={item.href}>
+            <span class="globalNavigation__link-text">{item.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <div class="globalNavigation__cursor" data-nav-cursor></div>
+</nav>
+
+<script>
+  const initNavigation = () => {
+    const navItemsContainer = document.querySelector(
+      "[data-nav-items-container]"
+    );
+    const navItems = document.querySelectorAll("[data-nav-items]");
+    const cursor = document.querySelector("[data-nav-cursor]");
+
+    if (!navItemsContainer || !navItems || !cursor) return;
+
+    const updateHoverIndicator = (targetItem: Element) => {
+      if (!cursor || !targetItem || !navItemsContainer) return;
+
+      const targetRect = targetItem.getBoundingClientRect();
+      const navItemsContainerRect = navItemsContainer.getBoundingClientRect();
+
+      const newX = targetRect.left - navItemsContainerRect.left;
+
+      cursor.animate(
+        [
+          {
+            transform: window
+              .getComputedStyle(cursor)
+              .getPropertyValue("transform"),
+          },
+          {
+            transform: `translate(${newX}px)`,
+          },
+        ],
+        {
+          duration: 300,
+          easing: "ease-in-out",
+          fill: "forwards", // アニメーション終了後に最終状態を維持
+        }
+      );
+    };
+
+    navItems.forEach((item) => {
+      item.addEventListener("mouseenter", () => {
+        updateHoverIndicator(item);
+      });
+    });
+
+    navItemsContainer.addEventListener("mouseleave", () => {
+      cursor.animate(
+        [
+          {
+            transform: window
+              .getComputedStyle(cursor)
+              .getPropertyValue("transform"),
+          },
+          {
+            transform: "translate(0px)",
+          },
+        ],
+        {
+          duration: 300,
+          easing: "ease-in-out",
+          fill: "forwards", // アニメーション終了後に最終状態を維持
+        }
+      );
+    });
+  };
+
+  initNavigation();
+</script>

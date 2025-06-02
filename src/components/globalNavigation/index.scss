@@ -1,0 +1,44 @@
+@use '@/styles/foundation/_variables.scss' as *;
+
+.globalNavigation {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  margin: 20px auto;
+  width: 500px;
+  font-weight: bold;
+
+  &__inner {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    position: relative;
+    border: 1px solid #000;
+    border-radius: 100px;
+    background-color: $white-color;
+  }
+
+  &__item {
+    flex: 1;
+  }
+
+  &__link {
+    display: block;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  &__cursor {
+    position: absolute;
+    top: 0;
+    left: 1px;
+    width: 124.5px;
+    height: 65px;
+    border-radius: 50px;
+    pointer-events: none;
+    background-color: $primary-color;
+    z-index: 1;
+  }
+}
