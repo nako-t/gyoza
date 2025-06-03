@@ -3,10 +3,6 @@ import "@/components/globalNavigation/index.scss";
 
 const navItems = [
   {
-    label: "Home",
-    href: "/",
-  },
-  {
     label: "探す",
     href: "/",
   },
@@ -44,7 +40,13 @@ const navItems = [
     const navItems = document.querySelectorAll("[data-nav-items]");
     const cursor = document.querySelector("[data-nav-cursor]");
 
-    if (!navItemsContainer || !navItems || !cursor) return;
+    if (
+      !navItemsContainer ||
+      !navItems ||
+      !cursor ||
+      !(cursor instanceof HTMLElement)
+    )
+      return;
 
     const updateHoverIndicator = (targetItem: Element) => {
       if (!cursor || !targetItem || !navItemsContainer) return;
@@ -53,6 +55,9 @@ const navItems = [
       const navItemsContainerRect = navItemsContainer.getBoundingClientRect();
 
       const newX = targetRect.left - navItemsContainerRect.left;
+
+      cursor.style.width = `${targetRect.width}px`;
+      cursor.style.height = `${targetRect.height}px`;
 
       cursor.animate(
         [
