@@ -37,9 +37,15 @@
 
 <style>
   .gyoza-container {
-    position: relative;
+    position: absolute;
     width: 100%;
     height: 100%;
+    background-color: #fff;
+    z-index: 3;
+
+    &.is-transparent {
+      background-color: transparent;
+    }
   }
 
   .gyoza {
@@ -50,7 +56,7 @@
   }
 
   .gyoza.mini {
-    top: 20px;
+    top: 0;
     left: 20px;
     width: 70px;
     height: 70px;
@@ -61,6 +67,9 @@
 <script>
   import { gsap, Flip } from "@/utils/gsap";
   const gyoza = document.querySelector(".gyoza") as SVGElement;
+  const gyozaContainer = document.querySelector(
+    ".gyoza-container"
+  ) as HTMLElement;
 
   // ローカルストレージをチェック
   // const hasVisited = localStorage.getItem("hasVisitedBefore");
@@ -80,15 +89,15 @@
     // 描画完了後、左上への移動アニメーション
     drawTl.add(() => {
       // 現在の状態を記録
-      const state = Flip.getState(gyoza);
+      const state = Flip.getState([gyoza, gyozaContainer]);
 
       // クラスを追加して位置とサイズを変更
       gyoza.classList.add("mini");
+      gyozaContainer.classList.add("is-transparent");
 
       // アニメーションを実行
       Flip.from(state, {
         duration: 1,
-        // ease: "power2.inOut",
       });
     });
 
