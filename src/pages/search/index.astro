@@ -1,0 +1,132 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import "@/pages/search/index.scss";
+
+const data = [
+  {
+    img: "",
+    shopName: "餃子",
+    location: "渋谷",
+    description: "美味しい",
+  },
+  {
+    img: "",
+    shopName: "",
+    location: "",
+    description: "美味しい",
+  },
+  {
+    img: "",
+    shopName: "",
+    location: "",
+    description: "美味しい",
+  },
+];
+---
+
+<Layout>
+  <div class="search">
+    {
+      data.map((item) => (
+        <div class="search__item" data-shop-modal="open">
+          <img src="" alt="" width="300" height="300" class="search__shopImg" />
+          <h3 class="search__shopName">{item.shopName}</h3>
+          <span class="search__location">{item.location}</span>
+        </div>
+      ))
+    }
+    <dialog class="shopModal" data-shop-modal="dialog">
+      <button class="shopModal__closeButton" data-shop-modal="close"
+        >閉じる</button
+      >
+      <div class="shopModal__slider">
+        <div class="shopModal__slideWrapper" data-shop-modal="slideWrapper">
+          {
+            data.map((item) => (
+              <div class="shopModal__slide" data-shop-modal="slide">
+                <img src="" alt="" width="" height="" loading="lazy" />
+                <div>
+                  <span>{item.shopName}</span>
+                  <span>{item.location}</span>
+                  <p>{item.description}</p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+      <button class="shopModal__nextButton" data-shop-modal="next"></button>
+      <button class="shopModal__prevButton" data-shop-modal="prev"></button>
+    </dialog>
+  </div>
+</Layout>
+
+<script>
+  (() => {
+    const modalToggles = document.querySelectorAll('[data-shop-modal="open"]');
+    const dialog = document.querySelector<HTMLDialogElement>(
+      '[data-shop-modal="dialog"]'
+    );
+    const closeElements = [
+      ...document.querySelectorAll('[data-shop-modal="close"]'),
+      dialog,
+    ];
+
+    const nextButton = document.querySelector('[data-shop-modal="next"]');
+    const prevButton = document.querySelector('[data-shop-modal="prev"]');
+    const slideWrapper = document.querySelector(
+      '[data-shop-modal="slideWrapper"]'
+    );
+
+    const slides = document.querySelectorAll('[data-shop-modal="slide"]');
+
+    let currentIndex = 0;
+    const totalSlides = slides.length;
+
+    const updateSliderPosition = () => {
+      if (slideWrapper instanceof HTMLElement) {
+        slideWrapper.style.transform = `translateX(${-currentIndex * 100}%)`;
+      }
+    };
+
+    if (
+      !(dialog instanceof HTMLDialogElement) ||
+      modalToggles.length === 0 ||
+      closeElements.length === 0
+    )
+      return;
+
+    modalToggles.forEach((modalToggle) => {
+      modalToggle.addEventListener("click", () => {
+        if (!(dialog instanceof HTMLDialogElement)) return;
+        dialog.showModal();
+      });
+    });
+
+    closeElements.forEach((closeElement) => {
+      closeElement?.addEventListener("click", (e) => {
+        if (e.target === dialog || e.currentTarget !== dialog) dialog.close();
+      });
+    });
+
+    nextButton?.addEventListener("click", () => {
+      console.log("next");
+      if (currentIndex < totalSlides - 1) {
+        currentIndex++;
+      } else {
+        currentIndex = 0; // 最後のスライドで次へを押したら最初のスライドに戻る
+      }
+      updateSliderPosition();
+    });
+
+    // 前へボタンのイベントリスナー
+    prevButton?.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+      } else {
+        currentIndex = totalSlides - 1; // 最初のスライドで前へを押したら最後のスライドに戻る
+      }
+      updateSliderPosition();
+    });
+  })();
+</script>
