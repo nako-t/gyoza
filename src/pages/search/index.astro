@@ -27,8 +27,8 @@ const data = [
 <Layout>
   <div class="search">
     {
-      data.map((item) => (
-        <div class="search__item" data-shop-modal="open">
+      data.map((item, index) => (
+        <div class="search__item" data-shop-modal="open" data-slideid={index}>
           <img src="" alt="" width="300" height="300" class="search__shopImg" />
           <h3 class="search__shopName">{item.shopName}</h3>
           <span class="search__location">{item.location}</span>
@@ -42,91 +42,122 @@ const data = [
       <div class="shopModal__slider">
         <div class="shopModal__slideWrapper" data-shop-modal="slideWrapper">
           {
-            data.map((item) => (
+            data.map((item, index) => (
               <div class="shopModal__slide" data-shop-modal="slide">
-                <img src="" alt="" width="" height="" loading="lazy" />
-                <div>
-                  <span>{item.shopName}</span>
-                  <span>{item.location}</span>
-                  <p>{item.description}</p>
+                <div class="shopModal__content">
+                  <img src="" alt="" width="250" height="250" loading="lazy" />
+                  <div class="shopModal__description">
+                    <span>{item.shopName + index}</span>
+                    <span>{item.location}</span>
+                    <p>{item.description}</p>
+                  </div>
                 </div>
               </div>
             ))
           }
         </div>
       </div>
-      <button class="shopModal__nextButton" data-shop-modal="next"></button>
-      <button class="shopModal__prevButton" data-shop-modal="prev"></button>
+      <button
+        class="shopModal__nextButton shopModal__slideButton"
+        data-shop-modal="next"></button>
+      <button
+        class="shopModal__prevButton shopModal__slideButton"
+        data-shop-modal="prev"></button>
     </dialog>
   </div>
 </Layout>
 
 <script>
   (() => {
-    const modalToggles = document.querySelectorAll('[data-shop-modal="open"]');
-    const dialog = document.querySelector<HTMLDialogElement>(
-      '[data-shop-modal="dialog"]'
-    );
-    const closeElements = [
-      ...document.querySelectorAll('[data-shop-modal="close"]'),
-      dialog,
-    ];
+    const initModal = (dialogElement: HTMLDialogElement) => {
+      const modalToggles = document.querySelectorAll<HTMLElement>(
+        '[data-shop-modal="open"]'
+      );
+      const closeButton = document.querySelector('[data-shop-modal="close"]');
 
-    const nextButton = document.querySelector('[data-shop-modal="next"]');
-    const prevButton = document.querySelector('[data-shop-modal="prev"]');
-    const slideWrapper = document.querySelector(
-      '[data-shop-modal="slideWrapper"]'
-    );
+      // 閉じる処理
+      const closeModal = () => {
+        dialogElement.close();
+      };
 
-    const slides = document.querySelectorAll('[data-shop-modal="slide"]');
+      // 開く処理
+      const openModal = () => {
+        dialogElement.showModal();
+      };
 
-    let currentIndex = 0;
-    const totalSlides = slides.length;
+      modalToggles.forEach((modalToggle) => {
+        const slideId = modalToggle.dataset.slideid;
 
-    const updateSliderPosition = () => {
-      if (slideWrapper instanceof HTMLElement) {
-        slideWrapper.style.transform = `translateX(${-currentIndex * 100}%)`;
-      }
+        modalToggle.addEventListener("click", () => {
+          console.log("modalToggle" + slideId);
+          const slider = initSlider(Number(slideId));
+          slider.updateSliderPosition(Number(slideId));
+          openModal();
+        });
+      });
+
+      // 閉じるボタン押下時
+      closeButton?.addEventListener("click", () => {
+        closeModal();
+      });
+
+      // backdrop押下時
+      dialogElement?.addEventListener("click", (e) => {
+        if (e.target === dialogElement) {
+          closeModal();
+        }
+      });
     };
 
-    if (
-      !(dialog instanceof HTMLDialogElement) ||
-      modalToggles.length === 0 ||
-      closeElements.length === 0
-    )
-      return;
+    const initSlider = (slideIndex: number) => {
+      const slides = document.querySelectorAll('[data-shop-modal="slide"]');
+      const slideWrapper = document.querySelector(
+        '[data-shop-modal="slideWrapper"]'
+      );
+      const totalSlides = slides.length;
+      const nextButton = document.querySelector('[data-shop-modal="next"]');
+      const prevButton = document.querySelector('[data-shop-modal="prev"]');
 
-    modalToggles.forEach((modalToggle) => {
-      modalToggle.addEventListener("click", () => {
-        if (!(dialog instanceof HTMLDialogElement)) return;
-        dialog.showModal();
+      // スライドする処理
+      const updateSliderPosition = (slideNumber: number) => {
+        if (slideWrapper instanceof HTMLElement) {
+          console.log("updateSliderPosition" + slideNumber);
+
+          slideWrapper.style.transform = `translateX(${-slideNumber * 100}%)`;
+        }
+      };
+
+      // 次に進む処理
+      nextButton?.addEventListener("click", () => {
+        console.log("next" + slideIndex);
+        if (slideIndex < totalSlides - 1) {
+          slideIndex++;
+        } else {
+          slideIndex = 0; // 最後のスライドで次へを押したら最初のスライドに戻る
+        }
+        updateSliderPosition(slideIndex);
       });
-    });
 
-    closeElements.forEach((closeElement) => {
-      closeElement?.addEventListener("click", (e) => {
-        if (e.target === dialog || e.currentTarget !== dialog) dialog.close();
+      // 前に戻る処理
+      prevButton?.addEventListener("click", () => {
+        if (slideIndex > 0) {
+          slideIndex--;
+        } else {
+          slideIndex = totalSlides - 1; // 最初のスライドで前へを押したら最後のスライドに戻る
+        }
+        updateSliderPosition(slideIndex);
       });
-    });
 
-    nextButton?.addEventListener("click", () => {
-      console.log("next");
-      if (currentIndex < totalSlides - 1) {
-        currentIndex++;
-      } else {
-        currentIndex = 0; // 最後のスライドで次へを押したら最初のスライドに戻る
-      }
-      updateSliderPosition();
-    });
+      return {
+        updateSliderPosition,
+      };
+    };
 
-    // 前へボタンのイベントリスナー
-    prevButton?.addEventListener("click", () => {
-      if (currentIndex > 0) {
-        currentIndex--;
-      } else {
-        currentIndex = totalSlides - 1; // 最初のスライドで前へを押したら最後のスライドに戻る
-      }
-      updateSliderPosition();
-    });
+    const dialogElement = document.querySelector<HTMLDialogElement>(
+      '[data-shop-modal="dialog"]'
+    );
+
+    if (!dialogElement) return;
+    initModal(dialogElement);
   })();
 </script>
