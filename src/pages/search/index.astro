@@ -68,96 +68,86 @@ const data = [
 </Layout>
 
 <script>
+  // スライダーのファクトリー関数（アロー関数式）
+  const createSlider = (wrapperSelector: string, slideSelector: string) => {
+    let currentIndex = 0;
+    const slideWrapper = document.querySelector<HTMLElement>(wrapperSelector);
+    const slides = document.querySelectorAll(slideSelector);
+    const totalSlides = slides.length;
+
+    const goTo = (index: number) => {
+      currentIndex = index;
+      update();
+    };
+
+    const next = () => {
+      currentIndex = (currentIndex + 1) % totalSlides;
+      update();
+    };
+
+    const prev = () => {
+      currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+      update();
+    };
+
+    const update = () => {
+      if (slideWrapper) {
+        slideWrapper.style.transform = `translateX(${-currentIndex * 100}%)`;
+      }
+    };
+
+    return { goTo, next, prev, update };
+  };
+
+  // モーダルのファクトリー関数（アロー関数式）
+  const createModal = (dialogSelector: string, closeSelector: string) => {
+    const dialog = document.querySelector<HTMLDialogElement>(dialogSelector);
+    const closeButton = document.querySelector(closeSelector);
+
+    const open = () => {
+      dialog?.showModal();
+    };
+
+    const close = () => {
+      dialog?.close();
+    };
+
+    closeButton?.addEventListener("click", close);
+    dialog?.addEventListener("click", (e) => {
+      if (e.target === dialog) close();
+    });
+
+    return { open, close };
+  };
+
+  // --- 初期化・連携 ---
   (() => {
-    const initModal = (dialogElement: HTMLDialogElement) => {
-      const modalToggles = document.querySelectorAll<HTMLElement>(
-        '[data-shop-modal="open"]'
-      );
-      const closeButton = document.querySelector('[data-shop-modal="close"]');
+    const slider = createSlider(
+      '[data-shop-modal="slideWrapper"]',
+      '[data-shop-modal="slide"]'
+    );
+    const modal = createModal(
+      '[data-shop-modal="dialog"]',
+      '[data-shop-modal="close"]'
+    );
 
-      // 閉じる処理
-      const closeModal = () => {
-        dialogElement.close();
-      };
-
-      // 開く処理
-      const openModal = () => {
-        dialogElement.showModal();
-      };
-
-      modalToggles.forEach((modalToggle) => {
-        const slideId = modalToggle.dataset.slideid;
-
-        modalToggle.addEventListener("click", () => {
-          console.log("modalToggle" + slideId);
-          const slider = initSlider(Number(slideId));
-          slider.updateSliderPosition(Number(slideId));
-          openModal();
+    // モーダルトリガー
+    document
+      .querySelectorAll<HTMLElement>('[data-shop-modal="open"]')
+      .forEach((toggle) => {
+        toggle.addEventListener("click", () => {
+          const slideId = Number(toggle.dataset.slideid) || 0;
+          slider.goTo(slideId);
+          modal.open();
         });
       });
 
-      // 閉じるボタン押下時
-      closeButton?.addEventListener("click", () => {
-        closeModal();
-      });
-
-      // backdrop押下時
-      dialogElement?.addEventListener("click", (e) => {
-        if (e.target === dialogElement) {
-          closeModal();
-        }
-      });
-    };
-
-    const initSlider = (slideIndex: number) => {
-      const slides = document.querySelectorAll('[data-shop-modal="slide"]');
-      const slideWrapper = document.querySelector(
-        '[data-shop-modal="slideWrapper"]'
-      );
-      const totalSlides = slides.length;
-      const nextButton = document.querySelector('[data-shop-modal="next"]');
-      const prevButton = document.querySelector('[data-shop-modal="prev"]');
-
-      // スライドする処理
-      const updateSliderPosition = (slideNumber: number) => {
-        if (slideWrapper instanceof HTMLElement) {
-          console.log("updateSliderPosition" + slideNumber);
-
-          slideWrapper.style.transform = `translateX(${-slideNumber * 100}%)`;
-        }
-      };
-
-      // 次に進む処理
-      nextButton?.addEventListener("click", () => {
-        console.log("next" + slideIndex);
-        if (slideIndex < totalSlides - 1) {
-          slideIndex++;
-        } else {
-          slideIndex = 0; // 最後のスライドで次へを押したら最初のスライドに戻る
-        }
-        updateSliderPosition(slideIndex);
-      });
-
-      // 前に戻る処理
-      prevButton?.addEventListener("click", () => {
-        if (slideIndex > 0) {
-          slideIndex--;
-        } else {
-          slideIndex = totalSlides - 1; // 最初のスライドで前へを押したら最後のスライドに戻る
-        }
-        updateSliderPosition(slideIndex);
-      });
-
-      return {
-        updateSliderPosition,
-      };
-    };
-
-    const dialogElement = document.querySelector<HTMLDialogElement>(
-      '[data-shop-modal="dialog"]'
-    );
-
-    if (!dialogElement) return;
-    initModal(dialogElement);
+    // スライドボタン
+    document
+      .querySelector('[data-shop-modal="next"]')
+      ?.addEventListener("click", slider.next);
+    document
+      .querySelector('[data-shop-modal="prev"]')
+      ?.addEventListener("click", slider.prev);
   })();
 </script>
