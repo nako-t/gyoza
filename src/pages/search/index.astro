@@ -25,7 +25,12 @@ const data = [
 ---
 
 <Layout>
-  <div class="search">
+  <ul class="tab search__tab" data-tab>
+    <li class="tab__item is-active" data-tab-item="list">List</li>
+    <li class="tab__item" data-tab-item="map">Map</li>
+  </ul>
+
+  <div class="search is-active" data-tab-content="list">
     {
       data.map((item, index) => (
         <div class="search__item" data-shop-modal="open" data-slideid={index}>
@@ -65,89 +70,133 @@ const data = [
         data-shop-modal="prev"></button>
     </dialog>
   </div>
-</Layout>
+  <div class="map" data-tab-content="map">
+    <p>map</p>
+  </div>
 
-<script>
-  // スライダーのファクトリー関数（アロー関数式）
-  const createSlider = (wrapperSelector: string, slideSelector: string) => {
-    let currentIndex = 0;
-    const slideWrapper = document.querySelector<HTMLElement>(wrapperSelector);
-    const slides = document.querySelectorAll(slideSelector);
-    const totalSlides = slides.length;
+  <script>
+    // スライダーのファクトリー関数（アロー関数式）
+    const createSlider = (wrapperSelector: string, slideSelector: string) => {
+      let currentIndex = 0;
+      const slideWrapper = document.querySelector<HTMLElement>(wrapperSelector);
+      const slides = document.querySelectorAll(slideSelector);
+      const totalSlides = slides.length;
 
-    const goTo = (index: number) => {
-      currentIndex = index;
-      update();
+      const goTo = (index: number) => {
+        currentIndex = index;
+        update();
+      };
+
+      const next = () => {
+        currentIndex = (currentIndex + 1) % totalSlides;
+        update();
+      };
+
+      const prev = () => {
+        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        update();
+      };
+
+      const update = () => {
+        if (slideWrapper) {
+          slideWrapper.style.transform = `translateX(${-currentIndex * 100}%)`;
+        }
+      };
+
+      return { goTo, next, prev, update };
     };
 
-    const next = () => {
-      currentIndex = (currentIndex + 1) % totalSlides;
-      update();
-    };
+    // モーダルのファクトリー関数（アロー関数式）
+    const createModal = (dialogSelector: string, closeSelector: string) => {
+      const dialog = document.querySelector<HTMLDialogElement>(dialogSelector);
+      const closeButton = document.querySelector(closeSelector);
 
-    const prev = () => {
-      currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-      update();
-    };
+      const open = () => {
+        dialog?.showModal();
+      };
 
-    const update = () => {
-      if (slideWrapper) {
-        slideWrapper.style.transform = `translateX(${-currentIndex * 100}%)`;
-      }
-    };
+      const close = () => {
+        dialog?.close();
+      };
 
-    return { goTo, next, prev, update };
-  };
-
-  // モーダルのファクトリー関数（アロー関数式）
-  const createModal = (dialogSelector: string, closeSelector: string) => {
-    const dialog = document.querySelector<HTMLDialogElement>(dialogSelector);
-    const closeButton = document.querySelector(closeSelector);
-
-    const open = () => {
-      dialog?.showModal();
-    };
-
-    const close = () => {
-      dialog?.close();
-    };
-
-    closeButton?.addEventListener("click", close);
-    dialog?.addEventListener("click", (e) => {
-      if (e.target === dialog) close();
-    });
-
-    return { open, close };
-  };
-
-  // --- 初期化・連携 ---
-  (() => {
-    const slider = createSlider(
-      '[data-shop-modal="slideWrapper"]',
-      '[data-shop-modal="slide"]'
-    );
-    const modal = createModal(
-      '[data-shop-modal="dialog"]',
-      '[data-shop-modal="close"]'
-    );
-
-    // モーダルトリガー
-    document
-      .querySelectorAll<HTMLElement>('[data-shop-modal="open"]')
-      .forEach((toggle) => {
-        toggle.addEventListener("click", () => {
-          const slideId = Number(toggle.dataset.slideid) || 0;
-          slider.goTo(slideId);
-          modal.open();
-        });
+      closeButton?.addEventListener("click", close);
+      dialog?.addEventListener("click", (e) => {
+        if (e.target === dialog) close();
       });
 
-    // スライドボタン
-    document
-      .querySelector('[data-shop-modal="next"]')
-      ?.addEventListener("click", slider.next);
-    document
-      .querySelector('[data-shop-modal="prev"]')
-      ?.addEventListener("click", slider.prev);
-  })();
-</script>
+      return { open, close };
+    };
+
+    // --- 初期化・連携 ---
+    (() => {
+      const slider = createSlider(
+        '[data-shop-modal="slideWrapper"]',
+        '[data-shop-modal="slide"]'
+      );
+      const modal = createModal(
+        '[data-shop-modal="dialog"]',
+        '[data-shop-modal="close"]'
+      );
+
+      // モーダルトリガー
+      document
+        .querySelectorAll<HTMLElement>('[data-shop-modal="open"]')
+        .forEach((toggle) => {
+          toggle.addEventListener("click", () => {
+            const slideId = Number(toggle.dataset.slideid) || 0;
+            slider.goTo(slideId);
+            modal.open();
+          });
+        });
+
+      // スライドボタン
+      document
+        .querySelector('[data-shop-modal="next"]')
+        ?.addEventListener("click", slider.next);
+      document
+        .querySelector('[data-shop-modal="prev"]')
+        ?.addEventListener("click", slider.prev);
+    })();
+
+    const createTab = (
+      tabSelector: string,
+      tabItemsSelector: string,
+      tabContentsSelector: string
+    ) => {
+      const tab = document.querySelector<HTMLElement>(tabSelector);
+      const tabItems = tab?.querySelectorAll<HTMLElement>(tabItemsSelector);
+      const tabContents =
+        document?.querySelectorAll<HTMLElement>(tabContentsSelector);
+
+      const updateTab = (activeTabValue: string) => {
+        tabItems?.forEach((tabItem) => {
+          if (tabItem.dataset.tabItem === activeTabValue) {
+            tabItem.classList.add("is-active");
+          } else {
+            tabItem.classList.remove("is-active");
+          }
+        });
+      };
+
+      const updateTabPannel = (activeTabValue: string) => {
+        tabContents?.forEach((tabContent) => {
+          if (tabContent.dataset.tabContent === activeTabValue) {
+            tabContent.classList.add("is-active");
+          } else {
+            tabContent.classList.remove("is-active");
+          }
+        });
+      };
+
+      tabItems?.forEach((tabItem) => {
+        tabItem.addEventListener("click", () => {
+          const activeTabValue = tabItem.dataset.tabItem ?? "";
+          updateTab(activeTabValue);
+          updateTabPannel(activeTabValue);
+        });
+      });
+    };
+
+    createTab("[data-tab]", "[data-tab-item]", "[data-tab-content]");
+  </script>
+</Layout>
