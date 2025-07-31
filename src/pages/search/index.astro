@@ -25,10 +25,6 @@ const data = [
 ---
 
 <Layout>
-  <ul class="tab search__tab" data-tab>
-    <li class="tab__item is-active" data-tab-item="list">List</li>
-    <li class="tab__item" data-tab-item="map">Map</li>
-  </ul>
 
   <div class="search is-active" data-tab-content="list">
     {
@@ -157,46 +153,5 @@ const data = [
         .querySelector('[data-shop-modal="prev"]')
         ?.addEventListener("click", slider.prev);
     })();
-
-    const createTab = (
-      tabSelector: string,
-      tabItemsSelector: string,
-      tabContentsSelector: string
-    ) => {
-      const tab = document.querySelector<HTMLElement>(tabSelector);
-      const tabItems = tab?.querySelectorAll<HTMLElement>(tabItemsSelector);
-      const tabContents =
-        document?.querySelectorAll<HTMLElement>(tabContentsSelector);
-
-      const updateTab = (activeTabValue: string) => {
-        tabItems?.forEach((tabItem) => {
-          if (tabItem.dataset.tabItem === activeTabValue) {
-            tabItem.classList.add("is-active");
-          } else {
-            tabItem.classList.remove("is-active");
-          }
-        });
-      };
-
-      const updateTabPannel = (activeTabValue: string) => {
-        tabContents?.forEach((tabContent) => {
-          if (tabContent.dataset.tabContent === activeTabValue) {
-            tabContent.classList.add("is-active");
-          } else {
-            tabContent.classList.remove("is-active");
-          }
-        });
-      };
-
-      tabItems?.forEach((tabItem) => {
-        tabItem.addEventListener("click", () => {
-          const activeTabValue = tabItem.dataset.tabItem ?? "";
-          updateTab(activeTabValue);
-          updateTabPannel(activeTabValue);
-        });
-      });
-    };
-
-    createTab("[data-tab]", "[data-tab-item]", "[data-tab-content]");
   </script>
 </Layout>
