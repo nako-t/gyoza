@@ -1,38 +1,38 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import "@/pages/search/index.scss";
-
-const data = [
-  {
-    img: "",
-    shopName: "餃子",
-    location: "渋谷",
-    description: "美味しい",
-  },
-  {
-    img: "",
-    shopName: "",
-    location: "",
-    description: "美味しい",
-  },
-  {
-    img: "",
-    shopName: "",
-    location: "",
-    description: "美味しい",
-  },
-];
+import { data } from "@/pages/search/shopData.ts";
 ---
 
 <Layout>
+  <div>
+    <div>
+      <input type="checkbox" id="tokyo" data-checkbox value="東京" />
+      <label for="tokyo">東京</label>
+    </div>
+    <div>
+      <input type="checkbox" id="tochigi" data-checkbox value="栃木" />
+      <label for="tochigi">栃木</label>
+    </div>
+    <div>
+      <input type="checkbox" id="chiba" data-checkbox value="千葉" />
+      <label for="chiba">千葉</label>
+    </div>
+  </div>
+  <button type="button" data-filter>絞り込む</button>
 
   <div class="search is-active" data-tab-content="list">
     {
       data.map((item, index) => (
-        <div class="search__item" data-shop-modal="open" data-slideid={index}>
+        <div
+          class="search__item"
+          data-shop-modal="open"
+          data-slideid={index}
+          data-area={item.area}
+        >
           <img src="" alt="" width="300" height="300" class="search__shopImg" />
           <h3 class="search__shopName">{item.shopName}</h3>
-          <span class="search__location">{item.location}</span>
+          <span class="search__location">{item.area}</span>
         </div>
       ))
     }
@@ -71,6 +71,31 @@ const data = [
   </div>
 
   <script>
+    import { getCheckedCheckboxValues } from "@/pages/search/initCheckbox.ts";
+
+    const filterButton = document.querySelector("[data-filter]");
+
+    filterButton?.addEventListener("click", () => {
+      const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
+      updateDisplayShops(filteredAreas);
+    });
+
+    const updateDisplayShops = (filteredAreas: string[]) => {
+      const shopButtonElements = document.querySelectorAll<HTMLElement>(
+        '[data-shop-modal="open"]'
+      );
+
+      Array.from(shopButtonElements).forEach((element) => {
+        if (!element.dataset.area) return;
+        if (filteredAreas.includes(element.dataset.area)) {
+          console.log(element.dataset.area);
+          element.classList.remove("is-not-display");
+        } else {
+          element.classList.add("is-not-display");
+        }
+      });
+    };
+
     // スライダーのファクトリー関数（アロー関数式）
     const createSlider = (wrapperSelector: string, slideSelector: string) => {
       let currentIndex = 0;
