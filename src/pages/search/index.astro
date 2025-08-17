@@ -5,21 +5,28 @@ import { data } from "@/pages/search/shopData.ts";
 ---
 
 <Layout>
-  <div>
-    <div>
-      <input type="checkbox" id="tokyo" data-checkbox value="東京" />
-      <label for="tokyo">東京</label>
+  <div class="filter">
+    <div class="filter__checkboxs">
+      <div>
+        <input type="checkbox" id="tokyo" data-checkbox value="東京" />
+        <label for="tokyo">東京</label>
+      </div>
+      <div>
+        <input type="checkbox" id="tochigi" data-checkbox value="栃木" />
+        <label for="tochigi">栃木</label>
+      </div>
+      <div>
+        <input type="checkbox" id="chiba" data-checkbox value="千葉" />
+        <label for="chiba">千葉</label>
+      </div>
+      <div>
+        <input type="checkbox" id="fukuoka" data-checkbox value="福岡" disabled class="filter__checkbox"/>
+        <label for="fukuoka">福岡</label>
+      </div>
     </div>
-    <div>
-      <input type="checkbox" id="tochigi" data-checkbox value="栃木" />
-      <label for="tochigi">栃木</label>
-    </div>
-    <div>
-      <input type="checkbox" id="chiba" data-checkbox value="千葉" />
-      <label for="chiba">千葉</label>
-    </div>
+    <button type="button" data-filter class="filter__button" disabled>絞り込む</button>
+    <button type="button" data-display-all class="filter__button is-hidden">全表示する</button>
   </div>
-  <button type="button" data-filter>絞り込む</button>
 
   <div class="search is-active" data-tab-content="list">
     {
@@ -49,7 +56,7 @@ import { data } from "@/pages/search/shopData.ts";
                   <img src="" alt="" width="250" height="250" loading="lazy" />
                   <div class="shopModal__description">
                     <span>{item.shopName + index}</span>
-                    <span>{item.location}</span>
+                    <span>{item.area}</span>
                     <p>{item.description}</p>
                   </div>
                 </div>
@@ -66,18 +73,33 @@ import { data } from "@/pages/search/shopData.ts";
         data-shop-modal="prev"></button>
     </dialog>
   </div>
-  <div class="map" data-tab-content="map">
-    <p>map</p>
-  </div>
 
   <script>
     import { getCheckedCheckboxValues } from "@/pages/search/initCheckbox.ts";
 
     const filterButton = document.querySelector("[data-filter]");
+    const displayAllButton = document.querySelector("[data-display-all]");
+    const checkboxes =
+      document.querySelectorAll<HTMLInputElement>("[data-checkbox]");
 
     filterButton?.addEventListener("click", () => {
       const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
       updateDisplayShops(filteredAreas);
+
+      displayAllButton?.classList.remove("is-hidden");
+    });
+
+    checkboxes?.forEach((checkbox) => {
+      checkbox.addEventListener("change", () => {
+        if (
+          Array.from(checkboxes).filter((checkbox) => checkbox.checked)
+            .length === 0
+        ) {
+          filterButton?.setAttribute("disabled", "");
+        } else {
+          filterButton?.removeAttribute("disabled");
+        }
+      });
     });
 
     const updateDisplayShops = (filteredAreas: string[]) => {
@@ -95,6 +117,8 @@ import { data } from "@/pages/search/shopData.ts";
         }
       });
     };
+
+
 
     // スライダーのファクトリー関数（アロー関数式）
     const createSlider = (wrapperSelector: string, slideSelector: string) => {
