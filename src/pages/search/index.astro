@@ -86,7 +86,9 @@ import { data } from "@/pages/search/shopData.ts";
       const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
       updateDisplayShops(filteredAreas);
 
-      displayAllButton?.classList.remove("is-hidden");
+      if(displayAllButton?.classList.contains("is-hidden")) {
+        displayAllButton?.classList.remove("is-hidden");
+      }
     });
 
     checkboxes?.forEach((checkbox) => {
