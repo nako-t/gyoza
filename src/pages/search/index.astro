@@ -2,30 +2,46 @@
 import Layout from "@/layouts/Layout.astro";
 import "@/pages/search/index.scss";
 import { data } from "@/pages/search/shopData.ts";
+import { areaData } from "@/pages/search/areaData.ts";
+
+const availableAreas = new Set(data.map((item) => item.area));
 ---
 
 <Layout>
-  <div class="filter">
-    <div class="filter__checkboxs">
-      <div>
-        <input type="checkbox" id="tokyo" data-checkbox value="東京" />
-        <label for="tokyo">東京</label>
-      </div>
-      <div>
-        <input type="checkbox" id="tochigi" data-checkbox value="栃木" />
-        <label for="tochigi">栃木</label>
-      </div>
-      <div>
-        <input type="checkbox" id="chiba" data-checkbox value="千葉" />
-        <label for="chiba">千葉</label>
-      </div>
-      <div>
-        <input type="checkbox" id="fukuoka" data-checkbox value="福岡" disabled class="filter__checkbox"/>
-        <label for="fukuoka">福岡</label>
-      </div>
+  <div class="">
+    <div class="filter">
+      {
+        Object.entries(areaData).map(([region, prefectures]) => (
+          <div class="filter__region">
+            <h4 class="filter__region-name">{region}</h4>
+            <div class="filter__checkboxs">
+              {prefectures.map((prefecture: string) => {
+                const isDisabled = !availableAreas.has(prefecture);
+                return (
+                  <div>
+                    <input
+                      type="checkbox"
+                      id={prefecture}
+                      data-checkbox
+                      value={prefecture}
+                      disabled={isDisabled}
+                      class:list={[{ filter__checkbox: isDisabled }]}
+                    />
+                    <label for={prefecture}>{prefecture}</label>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))
+      }
     </div>
-    <button type="button" data-filter class="filter__button" disabled>絞り込む</button>
-    <button type="button" data-display-all class="filter__button is-hidden">全表示する</button>
+    <button type="button" data-filter class="filter__button" disabled
+      >絞り込む</button
+    >
+    <button type="button" data-display-all class="filter__button is-hidden"
+      >全表示する</button
+    >
   </div>
 
   <div class="search is-active" data-tab-content="list">
@@ -75,6 +91,14 @@ import { data } from "@/pages/search/shopData.ts";
   </div>
 
   <script>
+    // 都道府県ごとにチェックボックスを表示 --8/18
+    // 餃子データがない都道府県チェックボックスはdisabled --8/18
+    // 最初は全表示
+    // 絞り込みボタンは最初は非活性
+    // チェックを入れたら、絞り込みボタンが活性化
+    // 一度絞り込んだら、全表示ボタンが表示される
+    // 全表示ボタン押下で、チェックボックスがリセット、全表示、全表示ボタンを非表示にする
+
     import { getCheckedCheckboxValues } from "@/pages/search/initCheckbox.ts";
 
     const filterButton = document.querySelector("[data-filter]");
@@ -86,7 +110,7 @@ import { data } from "@/pages/search/shopData.ts";
       const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
       updateDisplayShops(filteredAreas);
 
-      if(displayAllButton?.classList.contains("is-hidden")) {
+      if (displayAllButton?.classList.contains("is-hidden")) {
         displayAllButton?.classList.remove("is-hidden");
       }
     });
@@ -104,6 +128,18 @@ import { data } from "@/pages/search/shopData.ts";
       });
     });
 
+    displayAllButton?.addEventListener("click", () => {
+      checkboxes?.forEach((checkbox) => {
+        checkbox.checked = false;
+      });
+
+      const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
+      updateDisplayShops(filteredAreas);
+      displayAllButton?.classList.add("is-hidden");
+    });
+
+    const resetDisplayShops = () => {};
+
     const updateDisplayShops = (filteredAreas: string[]) => {
       const shopButtonElements = document.querySelectorAll<HTMLElement>(
         '[data-shop-modal="open"]'
@@ -112,7 +148,6 @@ import { data } from "@/pages/search/shopData.ts";
       Array.from(shopButtonElements).forEach((element) => {
         if (!element.dataset.area) return;
         if (filteredAreas.includes(element.dataset.area)) {
-          console.log(element.dataset.area);
           element.classList.remove("is-not-display");
         } else {
           element.classList.add("is-not-display");
@@ -120,7 +155,15 @@ import { data } from "@/pages/search/shopData.ts";
       });
     };
 
-
+    const initCheckboxs = () => {
+      checkboxes?.forEach((checkbox) => {
+        if (checkbox.checked) {
+          filterButton?.removeAttribute("disabled");
+        } else {
+          filterButton?.setAttribute("disabled", "");
+        }
+      });
+    };
 
     // スライダーのファクトリー関数（アロー関数式）
     const createSlider = (wrapperSelector: string, slideSelector: string) => {

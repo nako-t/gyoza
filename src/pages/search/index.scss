@@ -146,13 +146,23 @@
 }
 
 .filter {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  row-gap: 16px;
+  margin-inline: 20px;
 
   &__checkboxs {
     display: grid;
+    grid-template-columns: repeat(auto-fill, 100px);
+  }
+
+  &__region {
+    margin-bottom: 12px;
+  }
+
+  &__region-name {
+    font-weight: bold;
+    margin-bottom: 8px;
+    padding-bottom: 4px;
+    border-bottom: 2px solid #eee;
+    font-size: 20px;
   }
 
   &__checkbox {
