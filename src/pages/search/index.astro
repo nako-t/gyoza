@@ -106,6 +106,7 @@ const availableAreas = new Set(data.map((item) => item.area));
 
     import { getCheckedCheckboxValues } from "@/pages/search/initCheckbox.ts";
 
+    const formElement = document.querySelector("[data-filter-form]");
     const filterButton = document.querySelector("[data-filter]");
     const displayAllButton = document.querySelector("[data-display-all]");
     const checkboxes =
@@ -132,6 +133,11 @@ const availableAreas = new Set(data.map((item) => item.area));
       });
     });
 
+    formElement?.addEventListener("reset", () => {
+      filterButton?.setAttribute("disabled", "");
+      displayAllButton?.setAttribute("disabled", "");
+    });
+
     displayAllButton?.addEventListener("click", () => {
       const shopButtonElements = document.querySelectorAll<HTMLElement>(
         '[data-shop-modal="open"]'
@@ -142,8 +148,6 @@ const availableAreas = new Set(data.map((item) => item.area));
         }
       });
     });
-
-    const resetDisplayShops = () => {};
 
     const updateDisplayShops = (filteredAreas: string[]) => {
       const shopButtonElements = document.querySelectorAll<HTMLElement>(
@@ -156,16 +160,6 @@ const availableAreas = new Set(data.map((item) => item.area));
           element.classList.remove("is-not-display");
         } else {
           element.classList.add("is-not-display");
-        }
-      });
-    };
-
-    const initCheckboxs = () => {
-      checkboxes?.forEach((checkbox) => {
-        if (checkbox.checked) {
-          filterButton?.removeAttribute("disabled");
-        } else {
-          filterButton?.setAttribute("disabled", "");
         }
       });
     };
