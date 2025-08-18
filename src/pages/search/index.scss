@@ -147,14 +147,20 @@
 
 .filter {
   margin-inline: 20px;
+  margin-bottom: 28px;
 
   &__checkboxs {
     display: grid;
     grid-template-columns: repeat(auto-fill, 100px);
   }
 
-  &__region {
-    margin-bottom: 12px;
+  &__regions {
+    display: flex;
+    flex-direction: column;
+    row-gap: 12px;
+    margin-bottom: 16px;
+    border: none;
+    padding: 0;
   }
 
   &__region-name {
@@ -174,11 +180,25 @@
     }
   }
 
+  &__buttons {
+    display: flex;
+    justify-content: center;
+    column-gap: 20px;
+  }
+
   &__button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     background-color: #000;
-    padding: 10px;
+    padding: 12px;
     color: #fff;
-    border-radius: 20px;
+    border-radius: 8px;
+    width: 200px;
+
+    &--filter {
+      font-weight: bold;
+    }
 
     &:disabled {
       background-color: gray;

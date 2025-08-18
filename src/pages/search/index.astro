@@ -8,8 +8,8 @@ const availableAreas = new Set(data.map((item) => item.area));
 ---
 
 <Layout>
-  <div class="">
-    <div class="filter">
+  <form class="filter" data-filter-form>
+    <fieldset class="filter__regions">
       {
         Object.entries(areaData).map(([region, prefectures]) => (
           <div class="filter__region">
@@ -35,14 +35,19 @@ const availableAreas = new Set(data.map((item) => item.area));
           </div>
         ))
       }
+    </fieldset>
+    <div class="filter__buttons">
+      <button type="reset" data-display-all class="filter__button" disabled
+        >条件をリセットする</button
+      >
+      <button
+        type="button"
+        data-filter
+        class="filter__button filter__button--filter"
+        disabled>絞り込む</button
+      >
     </div>
-    <button type="button" data-filter class="filter__button" disabled
-      >絞り込む</button
-    >
-    <button type="button" data-display-all class="filter__button is-hidden"
-      >全表示する</button
-    >
-  </div>
+  </form>
 
   <div class="search is-active" data-tab-content="list">
     {
@@ -96,7 +101,7 @@ const availableAreas = new Set(data.map((item) => item.area));
     // 最初は全表示
     // 絞り込みボタンは最初は非活性
     // チェックを入れたら、絞り込みボタンが活性化
-    // 一度絞り込んだら、全表示ボタンが表示される
+    // チェックを入れたら、全表示ボタンが活性化
     // 全表示ボタン押下で、チェックボックスがリセット、全表示、全表示ボタンを非表示にする
 
     import { getCheckedCheckboxValues } from "@/pages/search/initCheckbox.ts";
@@ -109,33 +114,33 @@ const availableAreas = new Set(data.map((item) => item.area));
     filterButton?.addEventListener("click", () => {
       const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
       updateDisplayShops(filteredAreas);
-
-      if (displayAllButton?.classList.contains("is-hidden")) {
-        displayAllButton?.classList.remove("is-hidden");
-      }
     });
 
-    checkboxes?.forEach((checkbox) => {
+    // 各チェックボックスの変更を監視
+    checkboxes.forEach((checkbox) => {
       checkbox.addEventListener("change", () => {
         if (
           Array.from(checkboxes).filter((checkbox) => checkbox.checked)
             .length === 0
         ) {
           filterButton?.setAttribute("disabled", "");
+          displayAllButton?.setAttribute("disabled", "");
         } else {
           filterButton?.removeAttribute("disabled");
+          displayAllButton?.removeAttribute("disabled");
         }
       });
     });
 
     displayAllButton?.addEventListener("click", () => {
-      checkboxes?.forEach((checkbox) => {
-        checkbox.checked = false;
+      const shopButtonElements = document.querySelectorAll<HTMLElement>(
+        '[data-shop-modal="open"]'
+      );
+      Array.from(shopButtonElements).forEach((element) => {
+        if (element.classList.contains("is-not-display")) {
+          element.classList.remove("is-not-display");
+        }
       });
-
-      const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
-      updateDisplayShops(filteredAreas);
-      displayAllButton?.classList.add("is-hidden");
     });
 
     const resetDisplayShops = () => {};
