@@ -128,7 +128,15 @@ html:has(.shopModal[open]) {
     background-color: #fff;
 
     &:hover {
-      // opacity: 0.8;
+      .shopModal__closeIcon {
+        &::after {
+          rotate: 45deg;
+        }
+
+        &::before {
+          rotate: 135deg;
+        }
+      }
     }
 
     &::after {
@@ -143,6 +151,30 @@ html:has(.shopModal[open]) {
       border: 1px solid #000;
       background-color: #fff;
       z-index: -1;
+    }
+  }
+
+  &__closeIcon {
+    &::after,
+    &::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5px; /* 線の幅（太さ） */
+      height: 30px; /* 線の高さ */
+      background: #333;
+      transition: rotate 0.2s ease-out;
+    }
+
+    &::before {
+      translate: -50% -50%; // バツの線の50%分X軸、Y軸に移動する
+      rotate: 45deg;
+    }
+
+    &::after {
+      translate: -50% -50%;
+      rotate: -45deg;
     }
   }
 

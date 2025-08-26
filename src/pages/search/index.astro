@@ -72,7 +72,7 @@ const availableAreas = new Set(data.map((item) => item.area));
       ))
     }
     <dialog class="shopModal" data-shop-modal="dialog">
-      <button class="shopModal__closeButton" data-shop-modal="close"></button>
+      <button class="shopModal__closeButton" data-shop-modal="close"><span class="shopModal__closeIcon"></span></button>
       <div class="shopModal__slider">
         <div class="shopModal__slideWrapper" data-shop-modal="slideWrapper">
           {
@@ -109,6 +109,9 @@ const availableAreas = new Set(data.map((item) => item.area));
     // チェックを入れたら、全表示ボタンが活性化
     // 全表示ボタン押下で、チェックボックスがリセット、全表示、全表示ボタンを非表示にする
     // モーダルのデザイン整える
+    // バツボタン作成
+    // 探すUI検討
+    // ナビ作成
 
     import { getCheckedCheckboxValues } from "@/pages/search/initCheckbox.ts";
 
