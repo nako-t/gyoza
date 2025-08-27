@@ -12,8 +12,8 @@ import { recipe } from "./recipe";
           <li class="recipeLists__item" data-recipe-list={index} id={`recipe${index}`}>
             <h2>{title}</h2>
             <div class="recipeLists__body">
-              <img width="250" height="250" src={img} />
-              <p>{explanation}</p>
+              <img width="280" height="280" src={img} />
+              <p class="recipeLists__explanation">{explanation}</p>
             </div>
           </li>
         ))
@@ -102,7 +102,7 @@ import { recipe } from "./recipe";
 
     const mql = window.matchMedia("(min-width: 768px)");
 
-    function updateDisplayBasedOnWidth(e: MediaQueryListEvent) {
+    function updateDisplayBasedOnWidth(e: MediaQueryList | MediaQueryListEvent) {
       if (e.matches) {
         tableOfContentsItems.forEach((item, index) => {
           item.textContent = recipe[index].title;
@@ -114,6 +114,7 @@ import { recipe } from "./recipe";
       }
     }
 
+    updateDisplayBasedOnWidth(mql); // 初期表示時の状態を適用
     mql.addEventListener("change", updateDisplayBasedOnWidth);
   };
 

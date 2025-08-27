@@ -20,6 +20,10 @@
     gap: 8px;
     flex-wrap: wrap;
   }
+  &__explanation {
+    flex: 1;
+    min-width: 280px;
+  }
 }
 
 .tableOfContents {
