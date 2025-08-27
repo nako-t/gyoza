@@ -1,36 +1,57 @@
 .cookWrapper {
-    display: grid;
-    grid-template-columns: 8fr 2fr;
+  display: grid;
+  grid-template-columns: 8fr 2fr;
+  margin-inline: 20px;
+  column-gap: 8px;
 }
 
-
-
 .recipeLists {
-    &__item {
-        width: 100%;
-        height: 400px;
-        border: 1px solid #000;
-    }
+  &__item {
+    width: 100%;
+    height: 400px;
+    border: 1px solid #000;
+    display: flex;
+    flex-direction: column;
+    row-gap: 16px;
+  }
+
+  &__body {
+    display: flex;
+    column-gap: 8px;
+  }
 }
 
 .tableOfContents {
+  width: 100%;
+
+  &__fixed {
+    position: sticky;
+    top: 86px;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #000;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  &__item {
+    &:last-of-type {
+      .tableOfContents__button {
+        border-bottom: none;
+      }
+    }
+  }
+
+  &__button {
     width: 100%;
+    padding-block: 4px;
+    border-bottom: #000 solid 1px;
 
-    &__fixed {
-        position: sticky;
-        top: 86px;
+    &.active {
+      background-color: red;
     }
-
-    &__list {
-        display: flex;
-        flex-direction: column;
-        row-gap: 8px;
-        border: 1px solid #000;
-        border-radius: 12px;
-        padding-block: 8px;
-    }
-
-    &__item {
-
-    }
+  }
 }

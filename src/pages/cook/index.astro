@@ -6,26 +6,32 @@ const recipe = [
   {
     title: "材料",
     explanation: "キャベツ、ニラを刻む",
+    img: "",
   },
   {
     title: "切る",
     explanation: "キャベツ、ニラを刻む",
+    img: "",
   },
   {
     title: "混ぜる",
     explanation: "ひき肉に調味料を入れる",
+    img: "",
   },
   {
     title: "包む",
     explanation: "ひき肉に調味料を入れる",
+    img: "",
   },
   {
     title: "焼く",
     explanation: "ひき肉に調味料を入れる",
+    img: "",
   },
   {
     title: "完成",
     explanation: "ひき肉に調味料を入れる",
+    img: "",
   },
 ];
 ---
@@ -34,10 +40,13 @@ const recipe = [
   <div class="cookWrapper">
     <ol class="recipeLists">
       {
-        recipe.map(({ explanation }, index) => (
+        recipe.map(({ title, explanation, img }, index) => (
           <li class="recipeLists__item" data-recipe={index}>
-            {explanation}
-            {index}
+            <h2>{title}</h2>
+            <div class="recipeLists__body">
+              <img width="250" height="250" src={img} />
+              <p>{explanation}</p>
+            </div>
           </li>
         ))
       }
@@ -45,11 +54,17 @@ const recipe = [
     <div class="tableOfContentsWrapper">
       <div class="tableOfContents__fixed">
         <nav class="tableOfContents">
-          <ol class="tableOfContents__list">
+          <ol class="tableOfContents__list" data-indexs>
             {
               recipe.map(({ title }, index) => (
-                <li class="tableOfContents__item" data-table-of-contents>
-                  {title}
+                <li class="tableOfContents__item">
+                  <button
+                    data-table-of-contents={index}
+                    class="tableOfContents__button"
+                    type="button"
+                  >
+                    {title}
+                  </button>
                 </li>
               ))
             }
@@ -73,20 +88,21 @@ const recipe = [
       });
     });
 
-    const changeColor = (entries: IntersectionObserverEntry[]) => {
-      entries.forEach((entry, index) => {
+
+    const handleIntersection = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          console.log("test");
+          activeIndex(entry.target);
         }
       });
     };
 
     const options = {
       root: null,
-      rootMargin: "-50% 0px",
+      rootMargin: "-50% 0px", // ビューポートの中心
     };
 
-    const observer = new IntersectionObserver(changeColor, options);
+    const observer = new IntersectionObserver(handleIntersection, options);
 
     const recipeListsItems = [...document.querySelectorAll("[data-recipe]")];
 
@@ -95,6 +111,23 @@ const recipe = [
     recipeListsItems.map((item) => {
       observer.observe(item);
     });
+
+    const activeIndex = (element: Element) => {
+      // すでにアクティブになっている目次を選択
+      const currentActiveIndex = document.querySelector(
+        "[data-indexs] .active"
+      );
+      // すでにアクティブになっているものが0個の時（=null）以外は、activeクラスを除去
+      if (currentActiveIndex !== null) {
+        currentActiveIndex.classList.remove("active");
+      }
+      const indexNumber = (element as HTMLElement).dataset.recipe;
+
+      const newActiveIndex = document.querySelector(`[data-table-of-contents="${indexNumber}"]`);
+      newActiveIndex?.classList.add("active");
+    };
+
+
 
     const mql = window.matchMedia("(min-width: 768px)");
 
