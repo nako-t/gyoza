@@ -1,39 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import "@/pages/cook/index.scss";
-
-const recipe = [
-  {
-    title: "材料",
-    explanation: "キャベツ、ニラを刻む",
-    img: "",
-  },
-  {
-    title: "切る",
-    explanation: "キャベツ、ニラを刻む",
-    img: "",
-  },
-  {
-    title: "混ぜる",
-    explanation: "ひき肉に調味料を入れる",
-    img: "",
-  },
-  {
-    title: "包む",
-    explanation: "ひき肉に調味料を入れる",
-    img: "",
-  },
-  {
-    title: "焼く",
-    explanation: "ひき肉に調味料を入れる",
-    img: "",
-  },
-  {
-    title: "完成",
-    explanation: "ひき肉に調味料を入れる",
-    img: "",
-  },
-];
+import { recipe } from "./recipe";
 ---
 
 <Layout>
@@ -41,7 +9,7 @@ const recipe = [
     <ol class="recipeLists">
       {
         recipe.map(({ title, explanation, img }, index) => (
-          <li class="recipeLists__item" data-recipe={index}>
+          <li class="recipeLists__item" data-recipe-list={index} id={`recipe${index}`}>
             <h2>{title}</h2>
             <div class="recipeLists__body">
               <img width="250" height="250" src={img} />
@@ -76,6 +44,9 @@ const recipe = [
 </Layout>
 
 <script>
+  import { recipe } from "./recipe";
+
+
   const initRecipe = () => {
     const tableOfContentsItems = [
       ...document.querySelectorAll("[data-table-of-contents]"),
@@ -83,7 +54,7 @@ const recipe = [
 
     tableOfContentsItems.map((item, index) => {
       item.addEventListener("click", () => {
-        const target = document.querySelector(`[data-recipe="${index}"]`);
+        const target = document.querySelector(`[data-recipe-list="${index}"]`);
         target?.scrollIntoView({ behavior: "smooth", block: "center" });
       });
     });
@@ -104,7 +75,7 @@ const recipe = [
 
     const observer = new IntersectionObserver(handleIntersection, options);
 
-    const recipeListsItems = [...document.querySelectorAll("[data-recipe]")];
+    const recipeListsItems = [...document.querySelectorAll("[data-recipe-list]")];
 
     if (recipeListsItems.length === 0) return;
 
@@ -121,7 +92,7 @@ const recipe = [
       if (currentActiveIndex !== null) {
         currentActiveIndex.classList.remove("active");
       }
-      const indexNumber = (element as HTMLElement).dataset.recipe;
+      const indexNumber = (element as HTMLElement).dataset.recipeList;
 
       const newActiveIndex = document.querySelector(`[data-table-of-contents="${indexNumber}"]`);
       newActiveIndex?.classList.add("active");
@@ -133,11 +104,10 @@ const recipe = [
 
     function updateDisplayBasedOnWidth(e: MediaQueryListEvent) {
       if (e.matches) {
-        // document.body.style.backgroundColor = "red";
-        tableOfContentsItems.forEach((item, index) => {});
+        tableOfContentsItems.forEach((item, index) => {
+          item.textContent = recipe[index].title;
+        });
       } else {
-        /* the viewport is more than 600 pixels wide */
-        // document.body.style.backgroundColor = "blue";
         tableOfContentsItems.forEach((item, index) => {
           item.textContent = String(index);
         });

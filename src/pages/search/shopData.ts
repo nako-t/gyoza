@@ -9,14 +9,26 @@ export const data: ShopData[] = [
   },
   {
     img: "",
-    shopName: "",
+    shopName: "餃子",
     description: "美味しい2",
     area: "栃木",
   },
   {
     img: "",
-    shopName: "",
+    shopName: "餃子",
     description: "美味しい3",
+    area: "千葉",
+  },
+  {
+    img: "",
+    shopName: "餃子",
+    description: "美味しい4",
+    area: "千葉",
+  },
+  {
+    img: "",
+    shopName: "餃子",
+    description: "美味しい5",
     area: "千葉",
   },
 ];
