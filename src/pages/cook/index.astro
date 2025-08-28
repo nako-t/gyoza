@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import "@/pages/cook/index.scss";
 import { recipe } from "./recipe";
+
 ---
 
 <Layout>
@@ -10,9 +11,9 @@ import { recipe } from "./recipe";
       {
         recipe.map(({ title, explanation, img }, index) => (
           <li class="recipeLists__item" data-recipe-list={index} id={`recipe${index}`}>
-            <h2>{title}</h2>
+            <h2>{}{index} {title}</h2>
             <div class="recipeLists__body">
-              <img width="280" height="280" src={img} />
+              <img width="280" height="280" src={img} class="recipeLists__img" />
               <p class="recipeLists__explanation">{explanation}</p>
             </div>
           </li>
