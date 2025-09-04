@@ -45,7 +45,11 @@ if (!hasVisited) {
     </ul>
     <div class="globalNavigation__cursor" data-nav-cursor></div>
   </nav>
-  <button class="hamburgerButton" data-hamburger-button></button>
+  <button class="hamburgerButton" data-hamburger-button>
+    <span class="hamburgerButton__bar"></span>
+    <span class="hamburgerButton__bar"></span>
+    <span class="hamburgerButton__bar"></span>
+  </button>
 </header>
 
 <script>
@@ -134,6 +138,7 @@ if (!hasVisited) {
       if (!globalNavigation) return;
 
       globalNavigation.classList.toggle("is-active");
+      hamburgerButton.classList.toggle("is-open");
     });
   };
 

@@ -1,12 +1,12 @@
-@use '@/styles/foundation/_variables.scss' as *;
-@use '@/styles/foundation/_mixins.scss' as *;
+@use "@/styles/foundation/_variables.scss" as *;
+@use "@/styles/foundation/_mixins.scss" as *;
 
 .header {
-  position: fixed;
+  position: sticky;
   inset: 0;
-  z-index: 1;
+  // z-index: 1;
   padding-inline: 20px;
-  padding-top: 20px;
+  padding-block: 20px;
   display: flex;
   justify-content: center;
 }
@@ -15,6 +15,8 @@
   width: 500px;
   font-weight: bold;
   position: relative;
+  color: $base-color;
+
   @include mq("sp") {
     display: none;
 
@@ -24,7 +26,6 @@
       left: 0;
       width: 100%;
       height: 100vh;
-      background-color: $white-color;
       z-index: 1;
     }
   }
@@ -34,19 +35,29 @@
     align-items: center;
     list-style: none;
     position: relative;
-    border: 1px solid #000;
     border-radius: 100px;
-    background-color: $white-color;
+    background-color: $sub-color;
+    box-shadow: 0px 5px 15px -1px rgba(0, 0, 0, 0.35);
 
     @include mq("sp") {
       flex-direction: column;
       border-radius: 20px;
-      padding-block: 55px;
+      padding-block: 70px;
     }
   }
 
   &__item {
     flex: 1;
+
+    @include mq("sp") {
+      border-bottom: 1px solid $base-color;
+      width: 90%;
+      font-size: 20px;
+
+      &:first-of-type {
+        border-top: 1px solid $base-color;
+      }
+    }
   }
 
   &__link {
@@ -76,8 +87,6 @@
   display: none;
   width: 45px;
   height: 45px;
-  border: 1px solid #000;
-  border-radius: 50%;
 
   @include mq("sp") {
     display: block;
@@ -85,5 +94,47 @@
     top: 30px;
     right: 30px;
     z-index: 2;
+  }
+
+  &.is-open {
+    @include mq("sp") {
+      .hamburgerButton__bar {
+        background-color: $base-color;
+        position: absolute;
+
+        &:nth-of-type(1) {
+          transform: rotate(45deg);
+        }
+
+        &:nth-of-type(2) {
+          opacity: 0;
+        }
+
+        &:nth-of-type(3) {
+          transform: rotate(-45deg);
+        }
+      }
+    }
+  }
+
+  &__bar {
+    position: absolute;
+    top: calc((100% - 3px) / 2);
+    left: 0;
+    right: 0;
+    display: block;
+    width: 100%;
+    height: 5px;
+    background-color: $sub-color;
+    border-radius: 3px;
+    transition: all 0.3s;
+
+    &:first-of-type {
+      transform: translateY(-10px);
+    }
+
+    &:last-of-type {
+      transform: translateY(10px);
+    }
   }
 }
