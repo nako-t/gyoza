@@ -37,7 +37,7 @@ const availableAreas = new Set(data.map((item) => item.area));
       }
     </fieldset>
     <div class="filter__buttons">
-      <button type="reset" data-display-all class="filter__button" disabled
+      <button type="reset" data-button="reset" class="filter__button" disabled
         >条件をリセットする</button
       >
       <button
@@ -117,7 +117,7 @@ const availableAreas = new Set(data.map((item) => item.area));
 
     const formElement = document.querySelector("[data-filter-form]");
     const filterButton = document.querySelector("[data-filter]");
-    const displayAllButton = document.querySelector("[data-display-all]");
+    const resetButton = document.querySelector('[data-button="reset"]');
     const checkboxes =
       document.querySelectorAll<HTMLInputElement>("[data-checkbox]");
 
@@ -134,20 +134,21 @@ const availableAreas = new Set(data.map((item) => item.area));
             .length === 0
         ) {
           filterButton?.setAttribute("disabled", "");
-          displayAllButton?.setAttribute("disabled", "");
+          resetButton?.setAttribute("disabled", "");
         } else {
           filterButton?.removeAttribute("disabled");
-          displayAllButton?.removeAttribute("disabled");
+          resetButton?.removeAttribute("disabled");
         }
       });
     });
 
+    // リセットされたら、絞り込みボタンと、リセットボタンを非活性化
     formElement?.addEventListener("reset", () => {
       filterButton?.setAttribute("disabled", "");
-      displayAllButton?.setAttribute("disabled", "");
+      resetButton?.setAttribute("disabled", "");
     });
 
-    displayAllButton?.addEventListener("click", () => {
+    resetButton?.addEventListener("click", () => {
       const shopButtonElements = document.querySelectorAll<HTMLElement>(
         '[data-shop-modal="open"]'
       );
