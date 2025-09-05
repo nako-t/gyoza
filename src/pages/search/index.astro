@@ -52,11 +52,10 @@ const availableAreas = new Set(data.map((item) => item.area));
   <div class="search is-active" data-tab-content="list">
     {
       data.map((item, index) => (
-        <div class="search__item">
+        <div class="search__item" data-shop data-area={item.area}>
           <button
             data-shop-modal="open"
             data-slideid={index}
-            data-area={item.area}
           >
             <img
               src=""
@@ -112,6 +111,8 @@ const availableAreas = new Set(data.map((item) => item.area));
     // バツボタン作成
     // 探すUI検討
     // ナビ作成
+    // 作る・数字入れる
+    // 四角でかこう
 
     import { getCheckedCheckboxValues } from "@/pages/search/initCheckbox.ts";
 
@@ -149,10 +150,10 @@ const availableAreas = new Set(data.map((item) => item.area));
     });
 
     resetButton?.addEventListener("click", () => {
-      const shopButtonElements = document.querySelectorAll<HTMLElement>(
-        '[data-shop-modal="open"]'
+      const shopElements = document.querySelectorAll<HTMLElement>(
+         "[data-shop]"
       );
-      Array.from(shopButtonElements).forEach((element) => {
+      Array.from(shopElements).forEach((element) => {
         if (element.classList.contains("is-not-display")) {
           element.classList.remove("is-not-display");
         }
@@ -160,11 +161,11 @@ const availableAreas = new Set(data.map((item) => item.area));
     });
 
     const updateDisplayShops = (filteredAreas: string[]) => {
-      const shopButtonElements = document.querySelectorAll<HTMLElement>(
-        '[data-shop-modal="open"]'
+      const shopElements = document.querySelectorAll<HTMLElement>(
+        "[data-shop]"
       );
 
-      Array.from(shopButtonElements).forEach((element) => {
+      Array.from(shopElements).forEach((element) => {
         if (!element.dataset.area) return;
         if (filteredAreas.includes(element.dataset.area)) {
           element.classList.remove("is-not-display");
