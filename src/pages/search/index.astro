@@ -53,10 +53,7 @@ const availableAreas = new Set(data.map((item) => item.area));
     {
       data.map((item, index) => (
         <div class="search__item" data-shop data-area={item.area}>
-          <button
-            data-shop-modal="open"
-            data-slideid={index}
-          >
+          <button data-shop-modal="open" data-slideid={index}>
             <img
               src=""
               alt=""
@@ -71,7 +68,9 @@ const availableAreas = new Set(data.map((item) => item.area));
       ))
     }
     <dialog class="shopModal" data-shop-modal="dialog">
-      <button class="shopModal__closeButton" data-shop-modal="close"><span class="shopModal__closeIcon"></span></button>
+      <button class="shopModal__closeButton" data-shop-modal="close"
+        ><span class="shopModal__closeIcon"></span></button
+      >
       <div class="shopModal__slider">
         <div class="shopModal__slideWrapper" data-shop-modal="slideWrapper">
           {
@@ -80,7 +79,9 @@ const availableAreas = new Set(data.map((item) => item.area));
                 <div class="shopModal__content">
                   <img src="" alt="" width="250" height="250" loading="lazy" />
                   <div class="shopModal__description">
-                    <span class="shopModal__shopName">{item.shopName + index}</span>
+                    <span class="shopModal__shopName">
+                      {item.shopName + index}
+                    </span>
                     <span class="shopModal__location">{item.area}</span>
                     <p class="shopModal__descriptionText">{item.description}</p>
                   </div>
@@ -121,6 +122,7 @@ const availableAreas = new Set(data.map((item) => item.area));
     const resetButton = document.querySelector('[data-button="reset"]');
     const checkboxes =
       document.querySelectorAll<HTMLInputElement>("[data-checkbox]");
+    const shopElements = document.querySelectorAll<HTMLElement>("[data-shop]");
 
     filterButton?.addEventListener("click", () => {
       const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
@@ -130,10 +132,10 @@ const availableAreas = new Set(data.map((item) => item.area));
     // 各チェックボックスの変更を監視
     checkboxes.forEach((checkbox) => {
       checkbox.addEventListener("change", () => {
-        if (
-          Array.from(checkboxes).filter((checkbox) => checkbox.checked)
-            .length === 0
-        ) {
+        const hasSelectedItems = Array.from(checkboxes).some(
+          (checkbox) => checkbox.checked
+        );
+        if (!hasSelectedItems) {
           filterButton?.setAttribute("disabled", "");
           resetButton?.setAttribute("disabled", "");
         } else {
@@ -150,9 +152,6 @@ const availableAreas = new Set(data.map((item) => item.area));
     });
 
     resetButton?.addEventListener("click", () => {
-      const shopElements = document.querySelectorAll<HTMLElement>(
-         "[data-shop]"
-      );
       Array.from(shopElements).forEach((element) => {
         if (element.classList.contains("is-not-display")) {
           element.classList.remove("is-not-display");
@@ -161,10 +160,6 @@ const availableAreas = new Set(data.map((item) => item.area));
     });
 
     const updateDisplayShops = (filteredAreas: string[]) => {
-      const shopElements = document.querySelectorAll<HTMLElement>(
-        "[data-shop]"
-      );
-
       Array.from(shopElements).forEach((element) => {
         if (!element.dataset.area) return;
         if (filteredAreas.includes(element.dataset.area)) {
