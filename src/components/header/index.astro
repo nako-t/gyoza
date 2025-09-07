@@ -43,118 +43,86 @@ if (!hasVisited) {
 </header>
 
 <script>
-  import { navItems } from "./navItems.ts";
-
   const initNavigation = () => {
-    // 現在のパスを取得して、パスと一致するアイテムにカーソルを表示
-    // ホバーしたら移動する
-    // ホバーアウトしたら、元の位置に戻る
     const currentPath = window.location.pathname;
-    console.log(currentPath);
 
-    const navItemsContainer = document.querySelector(
+    const navItemsContainer = document.querySelector<HTMLElement>(
       "[data-nav-items-container]"
     );
-    const navItemElements = document.querySelectorAll("[data-nav-item]");
-    const cursor = document.querySelector("[data-nav-cursor]");
+    const navItemElements =
+      document.querySelectorAll<HTMLElement>("[data-nav-item]");
+    const cursor = document.querySelector<HTMLElement>("[data-nav-cursor]");
+    const navItemsContainerRect = navItemsContainer?.getBoundingClientRect();
 
     if (
       !navItemsContainer ||
-      !navItemElements ||
+      navItemElements.length === 0 ||
       !cursor ||
-      !(cursor instanceof HTMLElement)
+      !navItemsContainerRect
     )
       return;
 
-    const navItemsContainerRect = navItemsContainer.getBoundingClientRect();
+    const activeItem =
+      Array.from(navItemElements).find((item) => {
+        const itemLinkElement = item.querySelector<HTMLAnchorElement>(
+          "[data-nav-item-link]"
+        );
+        return itemLinkElement?.pathname === currentPath;
+      }) || navItemElements[0];
 
-    const updateHoverIndicator = (targetItem: Element) => {
+    const updateCursor = (
+      targetItem: Element,
+      options: { immediate?: boolean } = {}
+    ) => {
       const targetRect = targetItem.getBoundingClientRect();
-      const currentIndicatorRect = cursor.getBoundingClientRect();
-
-      console.log("targetRect" + targetRect.left);
-      console.log("currentIndicatorRect" + currentIndicatorRect.left);
-      console.log("navItemsContainerRect" + navItemsContainerRect.left);
-
       const newX = targetRect.left - navItemsContainerRect.left;
 
       cursor.style.width = `${targetRect.width}px`;
       cursor.style.height = `${targetRect.height}px`;
 
-      cursor.animate(
-        [
+      if (options.immediate) {
+        cursor.style.transform = `translate(${newX}px)`;
+      } else {
+        cursor.animate(
+          [
+            {
+              transform: window
+                .getComputedStyle(cursor)
+                .getPropertyValue("transform"),
+            },
+            {
+              transform: `translate(${newX}px)`,
+            },
+          ],
           {
-            transform: window
-              .getComputedStyle(cursor)
-              .getPropertyValue("transform"),
-          },
-          {
-            transform: `translate(${newX}px)`,
-          },
-        ],
-        {
-          duration: 300,
-          easing: "ease-in-out",
-          fill: "forwards", // アニメーション終了後に最終状態を維持
-        }
-      );
+            duration: 300,
+            easing: "ease-in-out",
+            fill: "forwards", // アニメーション終了後に最終状態を維持
+          }
+        );
+      }
     };
 
+    window.addEventListener("load", () => {
+      updateCursor(activeItem);
+    });
+
+    let resizeTimer: number;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        updateCursor(activeItem, { immediate: true });
+      }, 100);
+    });
+
     navItemElements.forEach((item) => {
-      // 現在のパスを取得して、パスと一致するアイテムにカーソルを表示
-      const itemLinkElement = item.querySelector("[data-nav-item-link]");
-
-      if (!(itemLinkElement instanceof HTMLAnchorElement) || !itemLinkElement)
-        return;
-
-      if (itemLinkElement.getAttribute("href") === currentPath) {
-        const itemRect = item.getBoundingClientRect();
-        cursor.style.width = `${itemRect.width}px`;
-        cursor.style.height = `${itemRect.height}px`;
-
-        const currentItemRect = item.getBoundingClientRect();
-        const newX = currentItemRect.left - navItemsContainerRect.left;
-
-        cursor.style.transform = `translate(${newX}px)`;
-      }
-
       item.addEventListener("mouseenter", () => {
-        updateHoverIndicator(item);
+        updateCursor(item);
       });
     });
 
     navItemsContainer.addEventListener("mouseleave", () => {
-        let newX = 0;
-
-      navItemElements.forEach((item) => {
-        // 現在のパスを取得して、パスと一致するアイテムにカーソルを表示
-        const itemLinkElement = item.querySelector("[data-nav-item-link]");
-        if (!(itemLinkElement instanceof HTMLAnchorElement) || !itemLinkElement)
-          return;
-
-        if (itemLinkElement.getAttribute("href") === currentPath) {
-          const currentItemRect = item.getBoundingClientRect();
-          newX = currentItemRect.left - navItemsContainerRect.left;
-        }
-      });
-
-      cursor.animate(
-        [
-          {
-            transform: window
-              .getComputedStyle(cursor)
-              .getPropertyValue("transform"),
-          },
-          {
-            transform: `translate(${newX}px)`,
-          },
-        ],
-        {
-          duration: 300,
-          easing: "ease-in-out",
-          fill: "forwards", // アニメーション終了後に最終状態を維持
-        }
-      );
+      updateCursor(activeItem);
     });
   };
 
