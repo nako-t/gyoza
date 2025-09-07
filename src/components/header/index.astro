@@ -1,21 +1,7 @@
 ---
 import "@/components/header/index.scss";
 import Gyoza from "@/components/gyoza/index.astro";
-
-const navItems = [
-  {
-    label: "探す",
-    href: "/search",
-  },
-  {
-    label: "作る",
-    href: "/cook",
-  },
-  {
-    label: "知る",
-    href: "/know",
-  },
-];
+import { navItems } from "./navItems.ts";
 
 // Cookieを使用して訪問履歴を確認
 // const hasVisited = Astro.cookies.has("visited");
@@ -35,8 +21,12 @@ if (!hasVisited) {
     <ul class="globalNavigation__inner" data-nav-items-container>
       {
         navItems.map((item) => (
-          <li class="globalNavigation__item" data-nav-items>
-            <a class="globalNavigation__link" href={item.href}>
+          <li class="globalNavigation__item" data-nav-item>
+            <a
+              class="globalNavigation__link"
+              href={item.href}
+              data-nav-item-link
+            >
               <span class="globalNavigation__link-text">{item.label}</span>
             </a>
           </li>
@@ -53,24 +43,38 @@ if (!hasVisited) {
 </header>
 
 <script>
+  import { navItems } from "./navItems.ts";
+
   const initNavigation = () => {
+    // 現在のパスを取得して、パスと一致するアイテムにカーソルを表示
+    // ホバーしたら移動する
+    // ホバーアウトしたら、元の位置に戻る
+    const currentPath = window.location.pathname;
+    console.log(currentPath);
+
     const navItemsContainer = document.querySelector(
       "[data-nav-items-container]"
     );
-    const navItems = document.querySelectorAll("[data-nav-items]");
+    const navItemElements = document.querySelectorAll("[data-nav-item]");
     const cursor = document.querySelector("[data-nav-cursor]");
 
     if (
       !navItemsContainer ||
-      !navItems ||
+      !navItemElements ||
       !cursor ||
       !(cursor instanceof HTMLElement)
     )
       return;
 
+    const navItemsContainerRect = navItemsContainer.getBoundingClientRect();
+
     const updateHoverIndicator = (targetItem: Element) => {
       const targetRect = targetItem.getBoundingClientRect();
-      const navItemsContainerRect = navItemsContainer.getBoundingClientRect();
+      const currentIndicatorRect = cursor.getBoundingClientRect();
+
+      console.log("targetRect" + targetRect.left);
+      console.log("currentIndicatorRect" + currentIndicatorRect.left);
+      console.log("navItemsContainerRect" + navItemsContainerRect.left);
 
       const newX = targetRect.left - navItemsContainerRect.left;
 
@@ -96,10 +100,23 @@ if (!hasVisited) {
       );
     };
 
-    navItems.forEach((item) => {
-      const itemRect = item.getBoundingClientRect();
-      cursor.style.width = `${itemRect.width}px`;
-      cursor.style.height = `${itemRect.height}px`;
+    navItemElements.forEach((item) => {
+      // 現在のパスを取得して、パスと一致するアイテムにカーソルを表示
+      const itemLinkElement = item.querySelector("[data-nav-item-link]");
+
+      if (!(itemLinkElement instanceof HTMLAnchorElement) || !itemLinkElement)
+        return;
+
+      if (itemLinkElement.getAttribute("href") === currentPath) {
+        const itemRect = item.getBoundingClientRect();
+        cursor.style.width = `${itemRect.width}px`;
+        cursor.style.height = `${itemRect.height}px`;
+
+        const currentItemRect = item.getBoundingClientRect();
+        const newX = currentItemRect.left - navItemsContainerRect.left;
+
+        cursor.style.transform = `translate(${newX}px)`;
+      }
 
       item.addEventListener("mouseenter", () => {
         updateHoverIndicator(item);
@@ -107,6 +124,20 @@ if (!hasVisited) {
     });
 
     navItemsContainer.addEventListener("mouseleave", () => {
+        let newX = 0;
+
+      navItemElements.forEach((item) => {
+        // 現在のパスを取得して、パスと一致するアイテムにカーソルを表示
+        const itemLinkElement = item.querySelector("[data-nav-item-link]");
+        if (!(itemLinkElement instanceof HTMLAnchorElement) || !itemLinkElement)
+          return;
+
+        if (itemLinkElement.getAttribute("href") === currentPath) {
+          const currentItemRect = item.getBoundingClientRect();
+          newX = currentItemRect.left - navItemsContainerRect.left;
+        }
+      });
+
       cursor.animate(
         [
           {
@@ -115,7 +146,7 @@ if (!hasVisited) {
               .getPropertyValue("transform"),
           },
           {
-            transform: "translate(0px)",
+            transform: `translate(${newX}px)`,
           },
         ],
         {
