@@ -1,23 +1,47 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import "@/pages/cook/index.scss";
-import { recipe } from "./recipe";
-
+import { recipe, ingredients } from "./recipe";
 ---
 
 <Layout>
+  <section class="cook">
+  <h2 class="pageTitle">餃子の作り方</h2>
   <div class="cookWrapper">
     <ol class="recipeLists">
       {
-        recipe.map(({ title, explanation, img }, index) => (
-          <li class="recipeLists__item" data-recipe-list={index} id={`recipe${index}`}>
-            <h2>{}{index} {title}</h2>
-            <div class="recipeLists__body">
-              <img width="280" height="280" src={img} class="recipeLists__img" />
-              <p class="recipeLists__explanation">{explanation}</p>
-            </div>
-          </li>
-        ))
+        recipe.map(({ title, explanation, img }, index) => {
+          const isIngredients = index === 0;
+          return (
+            <li class="recipeLists__item" data-recipe-list={index} id={`recipe${index}`}>
+              <h2 class="recipeLists__title"><span class="recipeLists__index">{index}</span>{title}</h2>
+              {isIngredients ? (
+                <div class="recipeLists__ingredients">
+                  {ingredients.map(({ title, items }) => (
+                    <div class="ingredientsCategory">
+                      <h3 class="ingredientsCategory__title">{title}</h3>
+                      <ul class="ingredientsCategory__list">
+                        {items.map(({ name, quantity }) => (
+                          <li class="ingredientsCategory__item">
+                            <span class="ingredientsCategory__name">{name}</span>
+                            <span class="ingredientsCategory__quantity">
+                              {quantity}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div class="recipeLists__body">
+                  <img width="280" height="280" src={img} class="recipeLists__img" />
+                  <p class="recipeLists__explanation">{explanation}</p>
+                </div>
+              )}
+            </li>
+          );
+        })
       }
     </ol>
     <div class="tableOfContentsWrapper">
@@ -42,6 +66,7 @@ import { recipe } from "./recipe";
       </div>
     </div>
   </div>
+  </section>
 </Layout>
 
 <script>
