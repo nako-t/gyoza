@@ -30,3 +30,34 @@ export const recipe = [
     img: "",
   },
 ];
+
+interface IngredientItem {
+  name: string;
+  quantity: string;
+}
+
+interface IngredientCategory {
+  title: string;
+  items: IngredientItem[];
+}
+
+export const ingredients: IngredientCategory[] = [
+  {
+    title: "具材",
+    items: [
+      { name: "ひき肉", quantity: "150g" },
+      { name: "キャベツ", quantity: "180g" },
+      { name: "ニラ", quantity: "1/2束" },
+      { name: "にんにく", quantity: "1かけ" },
+      { name: "生姜", quantity: "1かけ" },
+    ],
+  },
+  {
+    title: "調味料",
+    items: [
+      { name: "醤油", quantity: "大さじ1" },
+      { name: "ごま油", quantity: "大さじ1" },
+      { name: "塩コショウ", quantity: "少々" },
+    ],
+  },
+];
