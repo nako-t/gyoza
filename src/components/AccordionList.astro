@@ -4,17 +4,14 @@ const items = Array.from(
   { length: 10 },
   (_, index) => `リストアイテム ${index + 1}`
 );
-// 初期表示する数
-const initialVisibleCount = 3;
 ---
 
 <div class="accordion-container">
   <ul class="list">
-    {
-      items.map((item, index) => (
-        <li class={index >= initialVisibleCount ? "hidden" : ""}>{item}</li>
-      ))
-    }
+    {items.slice(0, 3).map((item) => <li>{item}</li>)}
+    <div class="hidden-group">
+      {items.slice(3).map((item) => <li>{item}</li>)}
+    </div>
   </ul>
   <button class="toggle-button">すべて表示</button>
 </div>
@@ -23,13 +20,13 @@ const initialVisibleCount = 3;
   .accordion-container {
     max-width: 600px;
     margin: 0 auto;
+    position: relative;
   }
 
   .list {
     list-style: none;
     padding: 0;
     margin: 0;
-    overflow: hidden;
   }
 
   .list li {
@@ -38,19 +35,14 @@ const initialVisibleCount = 3;
     background-color: white;
   }
 
-  .hidden {
-    max-height: 0;
+  .hidden-group {
+    display: none;
     opacity: 0;
-    transition: all 0.5s ease-in-out;
-  }
-
-  .list.expanded .hidden {
-    max-height: 60px;
-    opacity: 1;
+    height: 0;
+    overflow: hidden;
   }
 
   .toggle-button {
-    margin-top: 1rem;
     padding: 0.5rem 1rem;
     background-color: #007bff;
     color: white;
@@ -58,6 +50,8 @@ const initialVisibleCount = 3;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    position: absolute;
+    left: 0;
   }
 
   .toggle-button:hover {
@@ -66,15 +60,76 @@ const initialVisibleCount = 3;
 </style>
 
 <script>
-  const toggleButton = document.querySelector(".toggle-button");
-  const list = document.querySelector(".list");
+  const toggleButton = document.querySelector(
+    ".toggle-button"
+  ) as HTMLButtonElement;
+  const list = document.querySelector(".list") as HTMLUListElement;
+  const hiddenGroup = document.querySelector(".hidden-group") as HTMLDivElement;
 
-  if (toggleButton && list) {
-    toggleButton.addEventListener("click", () => {
-      list.classList.toggle("expanded");
-      toggleButton.textContent = list.classList.contains("expanded")
-        ? "閉じる"
-        : "すべて表示";
+  if (toggleButton && list && hiddenGroup) {
+    // アニメーションの設定
+    const showAnimation = [
+      {
+        opacity: 0,
+        height: 0,
+      },
+      {
+        opacity: 1,
+        height: "420px", // 7つのアイテム × 60px
+      },
+    ];
+
+    const hideAnimation = [
+      {
+        opacity: 1,
+        height: "420px",
+      },
+      {
+        opacity: 0,
+        height: 0,
+      },
+    ];
+
+    const timing: KeyframeAnimationOptions = {
+      duration: 500,
+      easing: "ease-in-out",
+      fill: "forwards",
+    };
+
+    let isExpanded = false;
+
+    const updateButtonPosition = () => {
+      const lastVisibleElement = isExpanded ? hiddenGroup : list.children[2];
+      if (!lastVisibleElement) return;
+
+      const rect = lastVisibleElement.getBoundingClientRect();
+      const containerRect = list.getBoundingClientRect();
+      toggleButton.style.top = `${rect.bottom - containerRect.top + 16}px`;
+    };
+
+    toggleButton.addEventListener("click", async () => {
+      isExpanded = !isExpanded;
+      toggleButton.textContent = isExpanded ? "閉じる" : "すべて表示";
+
+      if (isExpanded) {
+        hiddenGroup.style.display = "block";
+        const animation = hiddenGroup.animate(showAnimation, timing);
+        await animation.finished;
+      } else {
+        const animation = hiddenGroup.animate(hideAnimation, timing);
+        animation.onfinish = () => {
+          hiddenGroup.style.display = "none";
+        };
+        await animation.finished;
+      }
+
+      updateButtonPosition();
     });
+
+    // 初期位置の設定
+    updateButtonPosition();
+
+    // ウィンドウリサイズ時にボタンの位置を更新
+    window.addEventListener("resize", updateButtonPosition);
   }
 </script>
