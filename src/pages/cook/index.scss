@@ -133,10 +133,13 @@
   }
 
   &__button {
+    display: block;
     width: 100%;
     padding-block: 4px;
     border-bottom: solid 1px $base-color;
     color: $base-color;
+    text-align: center;
+
     &.active {
       background-color: $base-color;
       color: $sub-color;

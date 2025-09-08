@@ -51,13 +51,13 @@ import { recipe, ingredients } from "./recipe";
             {
               recipe.map(({ title }, index) => (
                 <li class="tableOfContents__item">
-                  <button
+                  <a
                     data-table-of-contents={index}
                     class="tableOfContents__button"
-                    type="button"
+                    href={`#recipe${index}`}
                   >
                     {title}
-                  </button>
+                  </a>
                 </li>
               ))
             }
@@ -79,7 +79,8 @@ import { recipe, ingredients } from "./recipe";
     ];
 
     tableOfContentsItems.map((item, index) => {
-      item.addEventListener("click", () => {
+      item.addEventListener("click", (e) => {
+        e.preventDefault();
         const target = document.querySelector(`[data-recipe-list="${index}"]`);
         target?.scrollIntoView({ behavior: "smooth", block: "center" });
       });
