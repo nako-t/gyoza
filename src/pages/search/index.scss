@@ -16,7 +16,6 @@
 
 .search {
   visibility: hidden;
-  padding-inline: 20px;
   padding-block: 0 40px;
   display: grid;
   grid-template-columns: repeat(auto-fit, 200px);
@@ -240,7 +239,6 @@ html:has(.shopModal[open]) {
 }
 
 .filter {
-  padding-inline: 20px;
   padding-bottom: 28px;
 
   &__checkboxs {
