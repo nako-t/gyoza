@@ -52,13 +52,11 @@ if (!hasVisited) {
     const navItemElements =
       document.querySelectorAll<HTMLElement>("[data-nav-item]");
     const cursor = document.querySelector<HTMLElement>("[data-nav-cursor]");
-    const navItemsContainerRect = navItemsContainer?.getBoundingClientRect();
 
     if (
       !navItemsContainer ||
       navItemElements.length === 0 ||
-      !cursor ||
-      !navItemsContainerRect
+      !cursor
     )
       return;
 
@@ -74,6 +72,7 @@ if (!hasVisited) {
       targetItem: Element,
       options: { immediate?: boolean } = {}
     ) => {
+      const navItemsContainerRect = navItemsContainer.getBoundingClientRect();
       const targetRect = targetItem.getBoundingClientRect();
       const newX = targetRect.left - navItemsContainerRect.left;
 
