@@ -107,67 +107,72 @@ const availableAreas = new Set(data.map((item) => item.area));
 
   <script>
     (() => {
-      const formElement =
-        document.querySelector<HTMLFormElement>("[data-filter-form]");
-      const filterButton =
-        document.querySelector<HTMLButtonElement>("[data-filter]");
-      const resetButton = document.querySelector<HTMLButtonElement>(
-        '[data-button="reset"]'
-      );
-      const checkboxes =
-        document.querySelectorAll<HTMLInputElement>("[data-checkbox]");
-      const shopElements =
-        document.querySelectorAll<HTMLElement>("[data-shop]");
+      const initFilterForm = () => {
+        const formElement =
+          document.querySelector<HTMLFormElement>("[data-filter-form]");
+        const filterButton =
+          document.querySelector<HTMLButtonElement>("[data-filter]");
+        const resetButton = document.querySelector<HTMLButtonElement>(
+          '[data-button="reset"]'
+        );
+        const checkboxes =
+          document.querySelectorAll<HTMLInputElement>("[data-checkbox]");
+        const shopElements =
+          document.querySelectorAll<HTMLElement>("[data-shop]");
 
-      const getCheckedCheckboxValues = (element: string) => {
-        const checkboxes = document.querySelectorAll<HTMLInputElement>(element);
+        const getCheckedCheckboxValues = (element: string) => {
+          const checkboxes =
+            document.querySelectorAll<HTMLInputElement>(element);
 
-        return Array.from(checkboxes)
-          .filter((checkbox) => checkbox.checked)
-          .map((checkbox) => checkbox.value);
+          return Array.from(checkboxes)
+            .filter((checkbox) => checkbox.checked)
+            .map((checkbox) => checkbox.value);
+        };
+
+        // 各チェックボックスの変更を監視
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener("change", () => {
+            const hasSelectedItems = Array.from(checkboxes).some(
+              (checkbox) => checkbox.checked
+            );
+            // hasSelectedItemsがfalseなら、!hasSelectedItemsはtrueになり、disabledプロパティもtrueになる
+            if (filterButton) filterButton.disabled = !hasSelectedItems;
+            if (resetButton) resetButton.disabled = !hasSelectedItems;
+          });
+        });
+
+        // リセットされたら、絞り込みボタンと、リセットボタンを非活性化
+        formElement?.addEventListener("reset", () => {
+          filterButton?.setAttribute("disabled", "");
+          resetButton?.setAttribute("disabled", "");
+        });
+
+        resetButton?.addEventListener("click", () => {
+          Array.from(shopElements).forEach((element) => {
+            if (element.classList.contains("is-not-display")) {
+              element.classList.remove("is-not-display");
+            }
+          });
+        });
+
+        const updateDisplayShops = (filteredAreas: string[]) => {
+          Array.from(shopElements).forEach((element) => {
+            if (!element.dataset.area) return;
+            if (filteredAreas.includes(element.dataset.area)) {
+              element.classList.remove("is-not-display");
+            } else {
+              element.classList.add("is-not-display");
+            }
+          });
+        };
+
+        filterButton?.addEventListener("click", () => {
+          const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
+          updateDisplayShops(filteredAreas);
+        });
       };
 
-      // 各チェックボックスの変更を監視
-      checkboxes.forEach((checkbox) => {
-        checkbox.addEventListener("change", () => {
-          const hasSelectedItems = Array.from(checkboxes).some(
-            (checkbox) => checkbox.checked
-          );
-          // hasSelectedItemsがfalseなら、!hasSelectedItemsはtrueになり、disabledプロパティもtrueになる
-          if (filterButton) filterButton.disabled = !hasSelectedItems;
-          if (resetButton) resetButton.disabled = !hasSelectedItems;
-        });
-      });
-
-      // リセットされたら、絞り込みボタンと、リセットボタンを非活性化
-      formElement?.addEventListener("reset", () => {
-        filterButton?.setAttribute("disabled", "");
-        resetButton?.setAttribute("disabled", "");
-      });
-
-      resetButton?.addEventListener("click", () => {
-        Array.from(shopElements).forEach((element) => {
-          if (element.classList.contains("is-not-display")) {
-            element.classList.remove("is-not-display");
-          }
-        });
-      });
-
-      const updateDisplayShops = (filteredAreas: string[]) => {
-        Array.from(shopElements).forEach((element) => {
-          if (!element.dataset.area) return;
-          if (filteredAreas.includes(element.dataset.area)) {
-            element.classList.remove("is-not-display");
-          } else {
-            element.classList.add("is-not-display");
-          }
-        });
-      };
-
-      filterButton?.addEventListener("click", () => {
-        const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
-        updateDisplayShops(filteredAreas);
-      });
+      initFilterForm();
 
       // スライダー
       const createSlider = (wrapperSelector: string, slideSelector: string) => {
