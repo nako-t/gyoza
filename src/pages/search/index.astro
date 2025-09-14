@@ -121,9 +121,6 @@ const availableAreas = new Set(data.map((item) => item.area));
           document.querySelectorAll<HTMLElement>("[data-shop]");
 
         const getCheckedCheckboxValues = (element: string) => {
-          const checkboxes =
-            document.querySelectorAll<HTMLInputElement>(element);
-
           return Array.from(checkboxes)
             .filter((checkbox) => checkbox.checked)
             .map((checkbox) => checkbox.value);
@@ -135,7 +132,7 @@ const availableAreas = new Set(data.map((item) => item.area));
             const hasSelectedItems = Array.from(checkboxes).some(
               (checkbox) => checkbox.checked
             );
-            // hasSelectedItemsがfalseなら、!hasSelectedItemsはtrueになり、disabledプロパティもtrueになる
+
             if (filterButton) filterButton.disabled = !hasSelectedItems;
             if (resetButton) resetButton.disabled = !hasSelectedItems;
           });
@@ -143,16 +140,14 @@ const availableAreas = new Set(data.map((item) => item.area));
 
         // リセットされたら、絞り込みボタンと、リセットボタンを非活性化
         formElement?.addEventListener("reset", () => {
-          filterButton?.setAttribute("disabled", "");
-          resetButton?.setAttribute("disabled", "");
-        });
-
-        resetButton?.addEventListener("click", () => {
           Array.from(shopElements).forEach((element) => {
             if (element.classList.contains("is-not-display")) {
               element.classList.remove("is-not-display");
             }
           });
+
+          filterButton?.setAttribute("disabled", "");
+          resetButton?.setAttribute("disabled", "");
         });
 
         const updateDisplayShops = (filteredAreas: string[]) => {
