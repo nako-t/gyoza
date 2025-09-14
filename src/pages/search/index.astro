@@ -161,60 +161,62 @@ const availableAreas = new Set(data.map((item) => item.area));
       });
     };
 
-    // スライダーのファクトリー関数（アロー関数式）
-    const createSlider = (wrapperSelector: string, slideSelector: string) => {
-      let currentIndex = 0;
-      const slideWrapper = document.querySelector<HTMLElement>(wrapperSelector);
-      const slides = document.querySelectorAll(slideSelector);
-      const totalSlides = slides.length;
-
-      const goTo = (index: number) => {
-        currentIndex = index;
-        update();
-      };
-
-      const next = () => {
-        currentIndex = (currentIndex + 1) % totalSlides;
-        update();
-      };
-
-      const prev = () => {
-        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
-        update();
-      };
-
-      const update = () => {
-        if (slideWrapper) {
-          slideWrapper.style.transform = `translateX(${-currentIndex * 100}%)`;
-        }
-      };
-
-      return { goTo, next, prev, update };
-    };
-
-    // モーダルのファクトリー関数（アロー関数式）
-    const createModal = (dialogSelector: string, closeSelector: string) => {
-      const dialog = document.querySelector<HTMLDialogElement>(dialogSelector);
-      const closeButton = document.querySelector(closeSelector);
-
-      const open = () => {
-        dialog?.showModal();
-      };
-
-      const close = () => {
-        dialog?.close();
-      };
-
-      closeButton?.addEventListener("click", close);
-      dialog?.addEventListener("click", (e) => {
-        if (e.target === dialog) close();
-      });
-
-      return { open, close };
-    };
-
     // --- 初期化・連携 ---
     (() => {
+      // スライダー
+      const createSlider = (wrapperSelector: string, slideSelector: string) => {
+        let currentIndex = 0;
+        const slideWrapper =
+          document.querySelector<HTMLElement>(wrapperSelector);
+        const slides = document.querySelectorAll(slideSelector);
+        const totalSlides = slides.length;
+
+        const goTo = (index: number) => {
+          currentIndex = index;
+          update();
+        };
+
+        const next = () => {
+          currentIndex = (currentIndex + 1) % totalSlides;
+          update();
+        };
+
+        const prev = () => {
+          currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+          update();
+        };
+
+        const update = () => {
+          if (slideWrapper) {
+            slideWrapper.style.transform = `translateX(${-currentIndex * 100}%)`;
+          }
+        };
+
+        return { goTo, next, prev, update };
+      };
+
+      // モーダル
+      const createModal = (dialogSelector: string, closeSelector: string) => {
+        const dialog =
+          document.querySelector<HTMLDialogElement>(dialogSelector);
+        const closeButton = document.querySelector(closeSelector);
+
+        const open = () => {
+          dialog?.showModal();
+        };
+
+        const close = () => {
+          dialog?.close();
+        };
+
+        closeButton?.addEventListener("click", close);
+        dialog?.addEventListener("click", (e) => {
+          if (e.target === dialog) close();
+        });
+
+        return { open, close };
+      };
+
       const slider = createSlider(
         '[data-shop-modal="slideWrapper"]',
         '[data-shop-modal="slide"]'
