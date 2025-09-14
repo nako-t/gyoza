@@ -2,6 +2,7 @@
 import "@/styles/global.scss";
 import Header from "@/components/header/index.astro";
 import "@/layouts/index.scss";
+import Gyoza from"@/components/gyoza/index.astro";
 ---
 
 <!doctype html>
@@ -15,9 +16,15 @@ import "@/layouts/index.scss";
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+Antique:wght@400;700&display=swap" rel="stylesheet">
+    <script is:inline>
+      if (sessionStorage.getItem('gyozaAnimationPlayed')) {
+        document.documentElement.classList.add('is-animated');
+      }
+    </script>
   </head>
   <body>
     <Header />
+    <Gyoza />
     <main>
       <slot />
     </main>

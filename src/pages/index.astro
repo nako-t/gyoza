@@ -1,37 +1,21 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import "../pages/index.scss";
-import Gyoza from "../components/gyoza/index.astro";
-import AccordionList from "@/components/AccordionList.astro";
-
-// Cookieを使用して訪問履歴を確認
-// const hasVisited = Astro.cookies.has("visited");
-// const hasVisited = false;
-// // 訪問済みでない場合はCookieを設定
-// if (!hasVisited) {
-//   Astro.cookies.set("visited", "true", {
-//     path: "/",
-//     maxAge: 60 * 60 * 24,
-//   });
-// }
 ---
 
 <Layout>
-  <!-- <h1 id="heading">Portfolio</h1> -->
-  <!-- <AccordionList /> -->
-
-  <script>
-    import { gsap, SplitText } from "@/utils/gsap";
-
-    gsap.set("h1", { opacity: 1 });
-
-    let split = SplitText.create("#heading", { type: "chars", mask: "chars" });
-    gsap.from(split.chars, {
-      y: 50,
-      opacity: 0,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: "power3.out",
-    });
-  </script>
+  <h1 id="heading">餃子を食べよう！🥟</h1>
 </Layout>
+<script>
+  import { gsap, SplitText } from "@/utils/gsap";
+
+  gsap.set("h1", { opacity: 1 });
+
+  let split = SplitText.create("#heading", { type: "chars", mask: "chars" });
+  gsap.from(split.chars, {
+    y: 50,
+    opacity: 0,
+    duration: 0.8,
+    stagger: 0.1,
+    ease: "power3.out",
+  });
+</script>

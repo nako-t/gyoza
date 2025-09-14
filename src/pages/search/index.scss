@@ -1,3 +1,5 @@
+@use "@/styles/foundation/_variables.scss" as *;
+
 .tab {
   display: flex;
   margin-inline: auto;
@@ -72,15 +74,14 @@ html:has(.shopModal[open]) {
   &__slider {
     width: 750px;
     overflow: hidden;
+    border-radius: 8px;
   }
 
   &__slideWrapper {
     display: flex;
-    // width: 2100px;
     transition: all 0.3s;
 
     &.is-slide {
-      // transform: translateX(-33.33%);
       transform: translateX(var(--slide-x, 0%));
     }
   }
@@ -95,6 +96,8 @@ html:has(.shopModal[open]) {
     align-items: center;
     padding-block: 20px;
     column-gap: 12px;
+    background-color: $sub-color;
+    color: $base-color;
   }
 
   &__description {
@@ -110,12 +113,6 @@ html:has(.shopModal[open]) {
     font-size: 20px;
   }
 
-  &__location {
-  }
-
-  &__descriptionText {
-  }
-
   &__closeButton {
     position: absolute;
     top: -60px;
@@ -123,8 +120,8 @@ html:has(.shopModal[open]) {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    border: 1px solid #000;
-    background-color: #fff;
+    border: 1px solid $black-color;
+    background-color: $base-color;
 
     &:hover {
       .shopModal__closeIcon {
@@ -181,7 +178,7 @@ html:has(.shopModal[open]) {
     position: absolute;
     width: 40px;
     height: 40px;
-    background-color: #000;
+    background-color: $base-color;
     border-radius: 50%;
     top: 50%;
     transform: translateY(-50%);
@@ -198,8 +195,8 @@ html:has(.shopModal[open]) {
       left: -2px;
       width: 13px; /* くの字を山なりに見た時、左側の長さ */
       height: 13px; /* くの字を山なりに見た時、右側の長さ */
-      border-top: 3px solid #fff; /* くの字を山なりに見た時、左側の太さと色 */
-      border-right: 3px solid #fff; /* くの字を山なりに見た時、右側の太さと色 */
+      border-top: 3px solid $black-color; /* くの字を山なりに見た時、左側の太さと色 */
+      border-right: 3px solid $black-color; /* くの字を山なりに見た時、右側の太さと色 */
       transform: rotate(45deg); /* くの字の向き */
     }
   }
@@ -215,8 +212,8 @@ html:has(.shopModal[open]) {
       right: -2px;
       width: 13px;
       height: 13px;
-      border-bottom: 3px solid #fff;
-      border-left: 3px solid #fff;
+      border-bottom: 3px solid $black-color;
+      border-left: 3px solid $black-color;
       transform: rotate(45deg);
     }
   }

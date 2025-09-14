@@ -1,32 +1,39 @@
-export const recipe = [
+interface RecipeItem {
+  title: string;
+  explanation?: string;
+  img?: string;
+}
+
+export const recipe: RecipeItem[] = [
   {
     title: "材料",
-    explanation: "キャベツ、ニラを刻む",
-    img: "",
   },
   {
     title: "切る",
-    explanation: "キャベツ、ニラを刻む",
+    explanation: "キャベツ、ニラをみじん切りにする。",
     img: "",
   },
   {
     title: "混ぜる",
-    explanation: "ひき肉に調味料を入れる",
+    explanation:
+      "ひき肉に調味料（醤油・ごま油・塩コショウ）を入れて混ぜる。その後、切ったキャベツ・ニラとすりおろしたニンニク・生姜を入れて混ぜる。",
     img: "",
   },
   {
     title: "包む",
-    explanation: "ひき肉に調味料を入れる",
+    explanation:
+      "ひだを作ってひたすら包む。皮が余ってしまった場合は、チーズを入れる。",
     img: "",
   },
   {
     title: "焼く",
-    explanation: "ひき肉に調味料を入れる",
+    explanation:
+      "フライパンに油をひいた後、餃子を並べ、蓋をして中火で焼く。皮の色が変わったら、水を入れて蒸し焼きにする。",
     img: "",
   },
   {
     title: "完成",
-    explanation: "ひき肉に調味料を入れる",
+    explanation: "お皿に盛り付けて完成！",
     img: "",
   },
 ];
