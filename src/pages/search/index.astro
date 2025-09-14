@@ -106,19 +106,24 @@ const availableAreas = new Set(data.map((item) => item.area));
   </div>
 
   <script>
-    import { getCheckedCheckboxValues } from "@/pages/search/initCheckbox.ts";
-
-    const formElement = document.querySelector("[data-filter-form]");
-    const filterButton = document.querySelector("[data-filter]");
-    const resetButton = document.querySelector('[data-button="reset"]');
+    const formElement =
+      document.querySelector<HTMLFormElement>("[data-filter-form]");
+    const filterButton =
+      document.querySelector<HTMLButtonElement>("[data-filter]");
+    const resetButton = document.querySelector<HTMLButtonElement>(
+      '[data-button="reset"]'
+    );
     const checkboxes =
       document.querySelectorAll<HTMLInputElement>("[data-checkbox]");
     const shopElements = document.querySelectorAll<HTMLElement>("[data-shop]");
 
-    filterButton?.addEventListener("click", () => {
-      const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
-      updateDisplayShops(filteredAreas);
-    });
+    const getCheckedCheckboxValues = (element: string) => {
+      const checkboxes = document.querySelectorAll<HTMLInputElement>(element);
+
+      return Array.from(checkboxes)
+        .filter((checkbox) => checkbox.checked)
+        .map((checkbox) => checkbox.value);
+    };
 
     // 各チェックボックスの変更を監視
     checkboxes.forEach((checkbox) => {
@@ -126,13 +131,9 @@ const availableAreas = new Set(data.map((item) => item.area));
         const hasSelectedItems = Array.from(checkboxes).some(
           (checkbox) => checkbox.checked
         );
-        if (!hasSelectedItems) {
-          filterButton?.setAttribute("disabled", "");
-          resetButton?.setAttribute("disabled", "");
-        } else {
-          filterButton?.removeAttribute("disabled");
-          resetButton?.removeAttribute("disabled");
-        }
+        // hasSelectedItemsがfalseなら、!hasSelectedItemsはtrueになり、disabledプロパティもtrueになる
+        if (filterButton) filterButton.disabled = !hasSelectedItems;
+        if (resetButton) resetButton.disabled = !hasSelectedItems;
       });
     });
 
@@ -161,7 +162,11 @@ const availableAreas = new Set(data.map((item) => item.area));
       });
     };
 
-    // --- 初期化・連携 ---
+    filterButton?.addEventListener("click", () => {
+      const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
+      updateDisplayShops(filteredAreas);
+    });
+
     (() => {
       // スライダー
       const createSlider = (wrapperSelector: string, slideSelector: string) => {
