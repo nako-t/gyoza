@@ -120,51 +120,65 @@ const availableAreas = new Set(data.map((item) => item.area));
         const shopElements =
           document.querySelectorAll<HTMLElement>("[data-shop]");
 
-        const getCheckedCheckboxValues = (element: string) => {
+        if (
+          !formElement ||
+          !filterButton ||
+          !resetButton ||
+          !checkboxes.length
+        ) {
+          return;
+        }
+
+        // チェックされたチェックボックスの値を取得する
+        const getCheckedValues = () => {
           return Array.from(checkboxes)
             .filter((checkbox) => checkbox.checked)
             .map((checkbox) => checkbox.value);
         };
 
-        // 各チェックボックスの変更を監視
-        checkboxes.forEach((checkbox) => {
-          checkbox.addEventListener("change", () => {
-            const hasSelectedItems = Array.from(checkboxes).some(
-              (checkbox) => checkbox.checked
-            );
+        // ボタンの活性・非活性状態を更新する
+        const updateButtonState = () => {
+          const hasSelectedItems = Array.from(checkboxes).some(
+            (checkbox) => checkbox.checked
+          );
+          filterButton.disabled = !hasSelectedItems;
+          resetButton.disabled = !hasSelectedItems;
+        };
 
-            if (filterButton) filterButton.disabled = !hasSelectedItems;
-            if (resetButton) resetButton.disabled = !hasSelectedItems;
-          });
-        });
+        // 店舗リストの表示を更新する
+        const updateShopVisibility = (filteredAreas: string[]) => {
+          shopElements.forEach((element) => {
+            const shopArea = element.dataset.area;
+            if (!shopArea) return;
 
-        // リセットされたら、絞り込みボタンと、リセットボタンを非活性化
-        formElement?.addEventListener("reset", () => {
-          Array.from(shopElements).forEach((element) => {
-            if (element.classList.contains("is-not-display")) {
-              element.classList.remove("is-not-display");
-            }
-          });
-
-          filterButton?.setAttribute("disabled", "");
-          resetButton?.setAttribute("disabled", "");
-        });
-
-        const updateDisplayShops = (filteredAreas: string[]) => {
-          Array.from(shopElements).forEach((element) => {
-            if (!element.dataset.area) return;
-            if (filteredAreas.includes(element.dataset.area)) {
-              element.classList.remove("is-not-display");
-            } else {
-              element.classList.add("is-not-display");
-            }
+            // filteredAreasに店舗のエリアが含まれていない場合に 'is-not-display' クラスを付与
+            const isHidden = !filteredAreas.includes(shopArea);
+            element.classList.toggle("is-not-display", isHidden);
           });
         };
 
-        filterButton?.addEventListener("click", () => {
-          const filteredAreas = getCheckedCheckboxValues("[data-checkbox]");
-          updateDisplayShops(filteredAreas);
+        // 絞り込みボタンがクリックされたときの処理
+        const handleFilterClick = () => {
+          const filteredAreas = getCheckedValues();
+          updateShopVisibility(filteredAreas);
+        };
+
+        // フォームがリセットされたときの処理
+        const handleFormReset = () => {
+          shopElements.forEach((element) => {
+            element.classList.remove("is-not-display");
+          });
+
+          // ブラウザがフォームをリセットするのを待ってからボタンの状態を更新するため、実行を遅延させる
+          requestAnimationFrame(updateButtonState);
+        };
+
+        checkboxes.forEach((checkbox) => {
+          checkbox.addEventListener("change", updateButtonState);
         });
+
+        filterButton.addEventListener("click", handleFilterClick);
+        formElement.addEventListener("reset", handleFormReset);
       };
 
       initFilterForm();
